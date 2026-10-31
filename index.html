@@ -85,12 +85,17 @@
     
         .sb-page{position:fixed;inset:0;z-index:50;background:#fff;color:#231f20;display:flex;flex-direction:column;height:100vh;height:100dvh;overflow:hidden;font-family:Arial,'Helvetica Neue',Helvetica,sans-serif}
         .sb-page.hidden,.sb-modal.hidden,.sb-pill.hidden{display:none!important}
-        .sb-top{display:flex;justify-content:space-between;align-items:center;padding:1vh 3vw;font-size:clamp(12px,2vh,16px);color:#666}
+        .sb-top{position:absolute;top:0;left:0;right:0;z-index:2;display:flex;justify-content:space-between;align-items:center;padding:1.2vh 3vw;font-size:clamp(12px,2vh,16px);color:#666;pointer-events:none}
+        .sb-top > *{pointer-events:auto}
         .sb-top b{color:#231f20;margin-left:6px}
-        .sb-cancel{border:1px solid #bbb;background:#fff;color:#555;padding:.8vh 2vw;border-radius:10px;font-weight:700;font-size:clamp(12px,2vh,15px)}
-        .sb-head{text-align:center;padding:0 3vw;font-weight:800}
-        .sb-h1{font-size:min(7vh,7vw);letter-spacing:.02em;line-height:1.05}
-        .sb-h2{font-size:min(2.7vh,3.2vw);letter-spacing:.03em;line-height:1.3}
+        .sb-cancel{border:0;background:#dc2626;color:#fff;padding:1vh 2.4vw;border-radius:10px;font-weight:800;font-size:clamp(12px,2vh,15px);box-shadow:0 2px 8px rgba(220,38,38,.35)}
+        .sb-head{text-align:center;padding:1.2vh 3vw 0;font-weight:800}
+        .sb-head.nologo{padding-top:4.5vh}
+        .sb-logos{display:flex;justify-content:center;align-items:center;gap:2.4vw;height:min(9vh,12vw);margin-bottom:.6vh}
+        .sb-logos:empty{display:none}
+        .sb-logos img{height:100%;width:auto;max-width:28vw;object-fit:contain}
+        .sb-h1{font-size:min(6vh,6vw);letter-spacing:.02em;line-height:1.05}
+        .sb-h2{font-size:min(2.3vh,2.9vw);letter-spacing:.03em;line-height:1.3}
         .sb-grid{flex:1;min-height:0;display:flex;align-items:center;justify-content:center;padding:1.8vh 3vw}
         .sb-inner{display:flex;flex-wrap:wrap;justify-content:center;gap:var(--gap,16px)}
         .sb-card{box-sizing:border-box;width:var(--cw);flex:0 0 var(--cw);padding:calc(var(--cw)*.04);border:calc(var(--cw)*.012 + 1px) solid #231f20;background:#fff;text-align:center;cursor:pointer;-webkit-tap-highlight-color:transparent;transition:opacity .15s,transform .12s,border-color .12s,box-shadow .12s}
@@ -101,13 +106,27 @@
         .sb-card.sel{border-color:#00a0e9;box-shadow:0 0 0 calc(var(--cw)*.02) rgba(0,160,233,.4);transform:scale(1.02)}
         .sb-grid.has-sel .sb-card:not(.sel){opacity:.4}
         .sb-foot{padding:1vh 4vw 2.2vh}
-        .sb-pill{background:#00a0e9;color:#fff;border-radius:999px;min-height:8.5vh;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:min(3.6vh,4vw);text-align:center;padding:0 3vw}
+        .sb-pill{background:#00a0e9;color:#fff;border-radius:999px;min-height:8vh;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:min(3.3vh,4vw);text-align:center;padding:0 3vw}
         .sb-pill-confirm{justify-content:space-between;gap:2vw;text-align:left}
         .sb-sel{display:flex;flex-direction:column;line-height:1.15;font-size:min(2.3vh,3vw);font-weight:600;min-width:0}
         .sb-sel b{font-size:min(3.4vh,4.4vw);font-weight:800;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
         .sb-acts{display:flex;gap:1.4vw;flex-shrink:0}
         .sb-b-ghost{background:#fff;color:#007bb8;border:0;border-radius:999px;padding:0 3vw;height:6vh;font-weight:800;font-size:min(2.6vh,3.2vw)}
         .sb-b-main{background:#231f20;color:#fff;border:0;border-radius:999px;padding:0 3.4vw;height:6vh;font-weight:800;font-size:min(2.6vh,3.2vw)}
+    
+        .sb-cf-back{background:rgba(2,6,23,.78);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+        .sb-cf{width:100%;max-width:460px;background:linear-gradient(160deg,#1e293b,#172036);border:1px solid #334155;border-radius:28px;padding:28px 24px;text-align:center;color:#fff;box-shadow:0 25px 60px rgba(0,0,0,.5);font-family:'Plus Jakarta Sans',system-ui,sans-serif}
+        .sb-cf-ico{width:64px;height:64px;border-radius:50%;margin:0 auto 14px;background:rgba(245,158,11,.15);border:2px solid rgba(245,158,11,.45);color:#fbbf24;font-size:26px;display:flex;align-items:center;justify-content:center}
+        .sb-cf-title{font-size:24px;font-weight:800;margin:0 0 8px}
+        .sb-cf-text{font-size:13px;line-height:1.5;color:#cbd5e1;margin:0 0 16px}
+        .sb-cf-card{display:flex;gap:14px;align-items:center;text-align:left;background:#2b3a52;border:1px solid #3b4b66;border-radius:18px;padding:14px;margin-bottom:18px}
+        .sb-cf-card img{width:72px;height:92px;object-fit:cover;border-radius:12px;border:2px solid #475569;flex:0 0 auto;background:#e5e7eb}
+        .sb-cf-no{font-size:11px;letter-spacing:.14em;font-weight:800;color:#60a5fa;text-transform:uppercase}
+        .sb-cf-name{font-size:20px;font-weight:800;text-transform:uppercase;line-height:1.15;margin:2px 0}
+        .sb-cf-slogan{font-size:13px;color:#94a3b8;line-height:1.35}
+        .sb-cf-btns{display:flex;gap:12px}
+        .sb-cf-cancel{flex:1;padding:14px;border-radius:14px;border:0;background:#dc2626;color:#fff;font-weight:800;font-size:15px}
+        .sb-cf-ok{flex:1.6;padding:14px;border-radius:14px;border:0;background:#059669;color:#fff;font-weight:800;font-size:15px;box-shadow:0 8px 20px rgba(5,150,105,.35)}
     </style>
 <link rel="manifest" href="manifest.webmanifest">
     <meta name="theme-color" content="#0f172a">
@@ -131,8 +150,8 @@
                     <p class="text-xs text-slate-400">Portal Pemilihan Kepala Desa Digital</p>
                 </div>
             </div>
-
-            </div>
+            <a id="btn-admin" href="#" onclick="openAdmin(event)" class="hidden px-4 py-2 text-xs font-semibold text-slate-300 hover:text-white border border-slate-700 rounded-xl transition-all"><i class="fa-solid fa-user-gear mr-1"></i> Admin</a>
+        </div>
     </header>
 
     <main class="flex-1">
@@ -201,7 +220,8 @@
                 <div>Pemilih<b id="voting-voter-name">-</b></div>
                 <button type="button" class="sb-cancel" onclick="cancelVoting()">Batal</button>
             </div>
-            <div class="sb-head">
+            <div class="sb-head" id="sb-head">
+                <div class="sb-logos" id="sb-logos"></div>
                 <div class="sb-h1">SURAT SUARA</div>
                 <div class="sb-h2" id="sb-l1">PEMILIHAN KEPALA DESA</div>
                 <div class="sb-h2" id="sb-l2"></div>
@@ -211,14 +231,7 @@
             <div id="voting-candidates-grid" class="sb-grid"><div id="sb-inner" class="sb-inner"></div></div>
             <div class="sb-foot">
                 <div id="sb-hint" class="sb-pill">Ketuk Foto Calon Pilihan Anda</div>
-                <div id="sb-confirm" class="sb-pill sb-pill-confirm hidden">
-                    <div class="sb-sel"><span>Pilihan Anda</span><b id="sb-sel-text">-</b></div>
-                    <div class="sb-acts">
-                        <button type="button" class="sb-b-ghost" onclick="closeConfirmVoteModal()">Ubah Pilihan</button>
-                        <button type="button" class="sb-b-main" onclick="submitVote()"><span id="confirm-btn-label">Simpan Pilihan</span></button>
-                    </div>
-                </div>
-            </div>
+                        </div>
         </section>
 
         
@@ -233,6 +246,7 @@
                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span> System Operational & Encrypted
             </p>
         </div>
+    <div id="app-ver" class="text-center text-[10px] text-slate-600 pb-2">Halaman bilik pemilih &bull; versi 2026.10.30-1</div>
     </footer>
 
 
@@ -240,7 +254,26 @@
     
 
     <!-- 3. CONFIRM VOTE MODAL -->
-        <div id="modal-kode" class="hidden sb-modal" style="z-index:70">
+        <div id="modal-confirm-vote" class="hidden sb-modal sb-cf-back">
+        <div class="sb-cf">
+            <div class="sb-cf-ico"><i class="fa-solid fa-check-double"></i></div>
+            <h2 class="sb-cf-title">Konfirmasi Coblos Suara</h2>
+            <p class="sb-cf-text">Apakah Anda yakin hendak memilih pasangan calon berikut? Pilihan tidak dapat diubah setelah dikonfirmasi.</p>
+            <div class="sb-cf-card">
+                <img id="cf-img" alt="" onerror="this.onerror=null;this.src=PH">
+                <div>
+                    <div class="sb-cf-no" id="cf-no">Calon nomor urut 01</div>
+                    <div class="sb-cf-name" id="cf-name">-</div>
+                    <div class="sb-cf-slogan" id="cf-slogan"></div>
+                </div>
+            </div>
+            <div class="sb-cf-btns">
+                <button type="button" class="sb-cf-cancel" onclick="closeConfirmVoteModal()">Batal</button>
+                <button type="button" class="sb-cf-ok" onclick="submitVote()"><i class="fa-solid fa-check"></i> <span id="confirm-btn-label">Simpan &amp; Cetak Hasil</span></button>
+            </div>
+        </div>
+    </div>
+    <div id="modal-kode" class="hidden sb-modal" style="z-index:70">
         <form class="sb-dialog" onsubmit="saveKode(event)">
             <div class="sb-dlg-kicker">KODE PERANGKAT BILIK</div>
             <p class="sb-dlg-note" style="margin:8px 0 14px">Masukkan kode dari panitia untuk mengaktifkan tablet ini.</p>
@@ -436,7 +469,19 @@
         function leaveFullscreen() {
             try { if (fsOn()) (document.exitFullscreen || document.webkitExitFullscreen).call(document); } catch (e) {}
         }
+        function adminUrl() { return /^https:\/\//.test(API_URL) ? API_URL + (API_URL.includes('?') ? '&' : '?') + 'admin=1' : ''; }
+        function kioskMode() {
+            try { return matchMedia('(display-mode: fullscreen)').matches || matchMedia('(display-mode: standalone)').matches || !!(document.fullscreenElement || document.webkitFullscreenElement); }
+            catch (e) { return false; }
+        }
+        /* Tombol Admin: hanya di halaman login, dan disembunyikan pada mode layar penuh / aplikasi terpasang (tablet bilik) */
+        function updateAdminButton() {
+            const a = document.getElementById('btn-admin');
+            if (a) a.classList.toggle('hidden', !adminUrl() || kioskMode() || currentPage !== 'voterlogin');
+        }
+        function openAdmin(e) { if (e) e.preventDefault(); const u = adminUrl(); if (u) window.open(u, '_blank', 'noopener'); }
         function updateFsButton() {
+            updateAdminButton();
             const b = document.getElementById('btn-fs');
             if (!b) return;
             b.classList.toggle('hidden', !(fsSupported() && !fsOn() && !adminToken && (currentPage === 'voterlogin' || currentPage === 'voting')));
@@ -665,6 +710,10 @@
             set('sb-l2', S('Kecamatan') ? 'KECAMATAN ' + S('Kecamatan') : '');
             set('sb-l3', S('Kabupaten') ? 'KABUPATEN ' + S('Kabupaten') : '');
             set('sb-l4', 'TAHUN ' + (S('Tahun') || new Date().getFullYear()));
+            const lg = document.getElementById('sb-logos');
+            lg.innerHTML = [appSet.Logo_Kiri, appSet.Logo_Kanan].map(u => String(u || '').trim()).filter(u => /^(https?:\/\/|data:image\/)/i.test(u))
+                .map(u => `<img src="${esc(u)}" alt="" onerror="this.style.display='none'">`).join('');
+            document.getElementById('sb-head').classList.toggle('nologo', !lg.children.length);
             inner.innerHTML = candidates.map(c => `
                 <div class="sb-card" data-id="${esc(c.id)}" onclick="confirmVoteCandidate('${esc(c.id)}')">
                     <div class="sb-no">${parseInt(c.number, 10) || esc(c.number)}</div>
@@ -703,19 +752,20 @@
             selectedCandidateForVote = c;
             document.querySelectorAll('#sb-inner .sb-card').forEach(el => el.classList.toggle('sel', el.dataset.id === c.id));
             document.getElementById('voting-candidates-grid').classList.add('has-sel');
-            document.getElementById('sb-sel-text').textContent = 'No. ' + (parseInt(c.number, 10) || c.number) + ' - ' + String(c.name).toUpperCase();
+            document.getElementById('cf-img').src = c.photo;
+            document.getElementById('cf-no').textContent = 'Calon nomor urut ' + String(c.number).padStart(2, '0');
+            document.getElementById('cf-name').textContent = c.name;
+            document.getElementById('cf-slogan').textContent = c.slogan || '';
             document.getElementById('confirm-btn-label').textContent = slipOn() ? 'Simpan & Cetak Hasil' : 'Simpan Pilihan';
-            document.getElementById('sb-hint').classList.add('hidden');
-            document.getElementById('sb-confirm').classList.remove('hidden');
+            document.getElementById('modal-confirm-vote').classList.remove('hidden');
             resetIdle();
         }
 
-        function closeConfirmVoteModal() {   // membatalkan pilihan sementara (nama lama dipertahankan)
+        function closeConfirmVoteModal() {   // menutup dialog & membatalkan pilihan sementara
             selectedCandidateForVote = null;
             document.querySelectorAll('#sb-inner .sb-card').forEach(el => el.classList.remove('sel'));
             const g = document.getElementById('voting-candidates-grid'); if (g) g.classList.remove('has-sel');
-            const h = document.getElementById('sb-hint'), c = document.getElementById('sb-confirm');
-            if (h) h.classList.remove('hidden'); if (c) c.classList.add('hidden');
+            const m = document.getElementById('modal-confirm-vote'); if (m) m.classList.add('hidden');
         }
 
         function submitVote() {
@@ -853,7 +903,17 @@
             }
         }
     
+
+        /* Pengaman: halaman bilik hanya untuk hosting luar (Netlify). Jika file ini tertempel di Apps Script, tampilkan peringatan */
+        function checkWrongHost(host) {
+            host = String(host || location.hostname);
+            if (!/(^|\.)(googleusercontent\.com|script\.google\.com)$/i.test(host)) return false;
+            document.body.insertAdjacentHTML('beforeend', '<div style="position:fixed;inset:0;z-index:99999;background:#7f1d1d;color:#fff;display:flex;align-items:center;justify-content:center;padding:24px;text-align:center;font-family:Arial,sans-serif"><div style="max-width:560px"><div style="font-size:26px;font-weight:800;margin-bottom:12px">File yang salah terpasang di Apps Script</div><p style="font-size:16px;line-height:1.5">Ini adalah file <b>halaman bilik</b> (khusus untuk Netlify). Di Apps Script, ganti isi file <b>Index</b> dengan <b>E-Voting_Pilkades_Digital.html</b>, lalu <b>Deploy &gt; Kelola deployment &gt; Edit &gt; Versi baru</b>.</p></div></div>');
+            return true;
+        }
+        checkWrongHost();
         if ('serviceWorker' in navigator) navigator.serviceWorker.register('sw.js').catch(() => {});
 </script>
 </body>
 </html>
+
