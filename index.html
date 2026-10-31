@@ -214,35 +214,35 @@
         
 
         
-
-    <section id="page-voting" class="hidden sb-page">
-        <!-- Bagian Atas: Info Pemilih & Tombol Batal dengan Latar Merah & Font Putih -->
-        <div class="sb-top" style="background: #dc2626; color: #ffffff; padding: 12px 20px; border-radius: 0 0 16px 16px; box-shadow: 0 4px 12px rgba(220,38,38,0.3);">
-            <div style="font-weight: 600;">Pemilih: <b id="voting-voter-name" style="color: #ffffff;">-</b></div>
+    <section id="page-voting" class="hidden sb-page" style="display: flex; flex-direction: column; overflow-y: auto;">
+        <!-- 1. Baris Paling Atas: Info Pemilih & Tombol Batal (Latar Merah, Font Putih) -->
+        <div class="sb-top" style="position: relative; width: 100%; background: #dc2626; color: #ffffff; padding: 12px 24px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 12px rgba(220,38,38,0.3); z-index: 10;">
+            <div style="font-weight: 600; font-size: 15px;">Pemilih: <b id="voting-voter-name" style="color: #ffffff;">-</b></div>
             <button type="button" class="sb-cancel" style="background: #ffffff; color: #dc2626; border: none; padding: 6px 16px; border-radius: 8px; font-weight: 800; cursor: pointer;" onclick="cancelVoting()">Batal</button>
         </div>
-
-        <!-- Logo Dipindah ke Bawah Teks Judul Surat Suara -->
-        <div class="sb-logos" id="sb-logos" style="margin-top: 12px; display: flex; justify-content: center; align-items: center; gap: 12px;"></div>
-
-        <!-- Header Surat Suara & Logo di Bawahnya -->
-        <div class="sb-head" id="sb-head" style="margin-top: 16px;">
-            <div class="sb-h1">SURAT SUARA</div>
-            <div class="sb-h2" id="sb-l1">PEMILIHAN KEPALA DESA</div>
+    
+        <!-- 2. Posisi Logo di Bawah Baris Merah Pemilih & Di Atas Surat Suara -->
+        <div class="sb-logos" id="sb-logos" style="margin-top: 16px; margin-bottom: 8px; display: flex; justify-content: center; align-items: center; gap: 12px; min-height: 48px;"></div>
+    
+        <!-- 3. Header Surat Suara (Judul & Wilayah) -->
+        <div class="sb-head" id="sb-head" style="text-align: center; margin-bottom: 12px;">
+            <div class="sb-h1" style="font-size: 28px; font-weight: 800; letter-spacing: 1px;">SURAT SUARA</div>
+            <div class="sb-h2" id="sb-l1" style="font-weight: 700; margin-top: 2px;">PEMILIHAN KEPALA DESA</div>
             <div class="sb-h2" id="sb-l2"></div>
             <div class="sb-h2" id="sb-l3"></div>
             <div class="sb-h2" id="sb-l4"></div>
-            
+        </div>
     
-        <div id="voting-candidates-grid" class="sb-grid">
+        <!-- 4. Grid Kartu Calon Kades -->
+        <div id="voting-candidates-grid" class="sb-grid" style="flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px 16px;">
             <div id="sb-inner" class="sb-inner"></div>
         </div>
     
-        <div class="sb-foot">
-            <div id="sb-hint" class="sb-pill">Ketuk Foto Calon Pilihan Anda</div>
+        <!-- 5. Kaki / Footer Petunjuk -->
+        <div class="sb-foot" style="padding: 12px 16px 20px; text-align: center;">
+            <div id="sb-hint" class="sb-pill" style="margin: 0 auto;">Ketuk Foto Calon Pilihan Anda</div>
         </div>
     </section>
-        
 
     </main>
 
