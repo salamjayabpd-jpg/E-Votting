@@ -900,10 +900,12 @@
             selectedCandidateForVote = c;
             document.querySelectorAll('#sb-inner .sb-card').forEach(el => el.classList.toggle('sel', el.dataset.id === c.id));
             document.getElementById('voting-candidates-grid').classList.add('has-sel');
+            
+            // Mengisi data ke modal konfirmasi (Tanpa Visi Misi)
             document.getElementById('cf-img').src = c.photo;
             document.getElementById('cf-no').textContent = 'Calon nomor urut ' + String(c.number).padStart(2, '0');
             document.getElementById('cf-name').textContent = c.name;
-            document.getElementById('cf-slogan').textContent = c.slogan || '';
+            
             document.getElementById('confirm-btn-label').textContent = slipOn() ? 'Simpan & Cetak Hasil' : 'Simpan Pilihan';
             document.getElementById('modal-confirm-vote').classList.remove('hidden');
             resetIdle();
