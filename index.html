@@ -83,7 +83,7 @@
         .sb-input{width:100%;box-sizing:border-box;padding:14px;border-radius:12px;border:2px solid #cbd5e1;font-size:18px;text-align:center;color:#0f172a}
         .sb-err{color:#dc2626;font-size:13px;min-height:18px;margin-top:8px}
     
-        .sb-page {
+.sb-page {
         position: fixed;
         inset: 0;
         z-index: 50;
@@ -110,7 +110,7 @@
         box-shadow: 0 4px 12px rgba(220,38,38,0.3);
         flex-shrink: 0;
     }
-    .sb-top-voter b { color: #ffffff; }
+    .sb-top-voter b { color: #ffffff; font-weight: 800; }
 
     /* Tombol Batal */
     .sb-cancel {
@@ -134,21 +134,113 @@
     .sb-head.nologo { padding-top: 2vh; }
     .sb-logos img { height: min(8vh, 10vw); width: auto; max-width: 25vw; object-fit: contain; }
     
-    /* SURAT SUARA: Ukuran diperbesar dan tebal */
+    /* SURAT SUARA: Ukuran diperbesar dan sangat tebal */
     .sb-h1 { 
-        font-size: min(7vh, 7vw); 
-        font-weight: 800; 
+        font-size: min(6vh, 6vw) !important; 
+        font-weight: 900 !important; 
         letter-spacing: .03em; 
         line-height: 1.1; 
     }
     
-    /* Teks Wilayah (Desa, Kecamatan, Kabupaten, Tahun): Semua Bold dan Ukuran Sama */
-    .sb-h2 { 
-        font-size: min(2.4vh, 3vw); 
-        font-weight: 700; 
-        letter-spacing: .02em; 
-        line-height: 1.35; 
-        text-transform: uppercase;
+    /* MEMAKSA SEMUA TEKS WILAYAH MENJADI BOLD / TEBAL DAN UKURAN SAMA */
+    .sb-h2, .sb-head div[id^="sb-l"] { 
+        font-size: min(2.2vh, 2.8vw) !important; 
+        font-weight: 800 !important; 
+        letter-spacing: .02em !important; 
+        line-height: 1.35 !important; 
+        text-transform: uppercase !important;
+        color: #000000 !important;
+    }
+
+    .sb-inner { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap, 16px); }
+    .sb-card { box-sizing: border-box; width: var(--cw); flex: 0 0 var(--cw); padding: calc(var(--cw)*.04); border: calc(var(--cw)*.012 + 1px) solid #231f20; background: #fff; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity .15s, transform .12s, border-color .12s, box-shadow .12s; }
+    .sb-no { font-size: calc(var(--cw)*.15); font-weight: 800; line-height: 1.1; }
+    .sb-photo { width: 100%; aspect-ratio: 3/4; border: 1px solid #231f20; background: #e5e7eb; overflow: hidden; }
+    .sb-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .sb-name { font-size: max(11px, calc(var(--cw)*.075)); font-weight: 800; text-transform: uppercase; line-height: 1.2; margin-top: calc(var(--cw)*.03); min-height: calc(var(--cw)*.18); display: flex; align-items: center; justify-content: center; }
+    .sb-card.sel { border-color: #00a0e9; box-shadow: 0 0 0 calc(var(--cw)*.02) rgba(0,160,233,.4); transform: scale(1.02); }
+    .sb-grid.has-sel .sb-card:not(.sel) { opacity: .4; }
+    .sb-pill { background: #00a0e9; color: #fff; border-radius: 999px; min-height: 8vh; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: min(3.3vh, 4vw); text-align: center; padding: 0 3vw; margin: 0 auto; }
+    
+    .sb-cf-back { background: rgba(2,6,23,.78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+    .sb-cf { width: 100%; max-width: 460px; background: linear-gradient(160deg,#1e293b,#172036); border: 1px solid #334155; border-radius: 28px; padding: 28px 24px; text-align: center; color: #fff; box-shadow: 0 25px 60px rgba(0,0,0,.5); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+    .sb-cf-ico { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 14px; background: rgba(245,158,11,.15); border: 2px solid rgba(245,158,11,.45); color: #fbbf24; font-size: 26px; display: flex; align-items: center; justify-content: center; }
+    .sb-cf-title { font-size: 24px; font-weight: 800; margin: 0 0 8px; }
+    .sb-cf-text { font-size: 13px; line-height: 1.5; color: #cbd5e1; margin: 0 0 16px; }
+    .sb-cf-card { display: flex; gap: 14px; align-items: center; text-align: left; background: #2b3a52; border: 1px solid #3b4b66; border-radius: 18px; padding: 14px; margin-bottom: 18px; }
+    .sb-cf-card img { width: 72px; height: 92px; object-fit: cover; border-radius: 12px; border: 2px solid #475569; flex: 0 0 auto; background: #e5e7eb; }
+    .sb-cf-no { font-size: 11px; letter-spacing: .14em; font-weight: 800; color: #60a5fa; text-transform: uppercase; }
+    .sb-cf-name { font-size: 20px; font-weight: 800; text-transform: uppercase; line-height: 1.15; margin: 2px 0; }
+    .sb-cf-slogan { font-size: 13px; color: #94a3b8; line-height: 1.35; }
+    .sb-cf-btns { display: flex; gap: 12px; }
+    .sb-cf-cancel { flex: 1; padding: 14px; border-radius: 14px; border: 0; background: #dc2626; color: #fff; font-weight: 800; font-size: 15px; }
+    .sb-cf-ok { flex: 1.6; padding: 14px; border-radius: 14px; border: 0; background: #059669; color: #fff; font-weight: 800; font-size: 15px; box-shadow: 0 8px 20px rgba(5,150,105,.35); }.sb-page {
+        position: fixed;
+        inset: 0;
+        z-index: 50;
+        background: #fff;
+        color: #231f20;
+        display: flex;
+        flex-direction: column;
+        height: 100vh;
+        height: 100dvh;
+        overflow-y: auto;
+        font-family: Arial, 'Helvetica Neue', Helvetica, sans-serif;
+    }
+    .sb-page.hidden, .sb-modal.hidden, .sb-pill.hidden { display: none !important; }
+
+    /* Baris Info Pemilih & Tombol Batal (Latar Merah) */
+    .sb-top-voter {
+        width: 100%;
+        background: #dc2626; 
+        color: #ffffff; 
+        padding: 12px 20px; 
+        display: flex; 
+        justify-content: space-between; 
+        align-items: center; 
+        box-shadow: 0 4px 12px rgba(220,38,38,0.3);
+        flex-shrink: 0;
+    }
+    .sb-top-voter b { color: #ffffff; font-weight: 800; }
+
+    /* Tombol Batal */
+    .sb-cancel {
+        background: #ffffff !important;
+        color: #dc2626 !important;
+        border: none;
+        padding: 6px 16px;
+        border-radius: 8px;
+        font-weight: 800;
+        cursor: pointer;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+
+    /* Urutan Tata Letak Elemen */
+    .sb-top-voter { order: 1; }  
+    .sb-logos     { order: 2; margin: 12px auto 4px !important; display: flex !important; justify-content: center; align-items: center; gap: 12px; flex-shrink: 0; } 
+    .sb-head      { order: 3; text-align: center; padding: 0 16px; flex-shrink: 0; } 
+    .sb-grid      { order: 4; flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px 16px; min-height: 0; } 
+    .sb-foot      { order: 5; padding: 10px 16px 16px; flex-shrink: 0; text-align: center; } 
+
+    .sb-head.nologo { padding-top: 2vh; }
+    .sb-logos img { height: min(8vh, 10vw); width: auto; max-width: 25vw; object-fit: contain; }
+    
+    /* SURAT SUARA: Ukuran diperbesar dan sangat tebal */
+    .sb-h1 { 
+        font-size: min(6vh, 6vw) !important; 
+        font-weight: 900 !important; 
+        letter-spacing: .03em; 
+        line-height: 1.1; 
+    }
+    
+    /* MEMAKSA SEMUA TEKS WILAYAH MENJADI BOLD / TEBAL DAN UKURAN SAMA */
+    .sb-h2, .sb-head div[id^="sb-l"] { 
+        font-size: min(2.2vh, 2.8vw) !important; 
+        font-weight: 800 !important; 
+        letter-spacing: .02em !important; 
+        line-height: 1.35 !important; 
+        text-transform: uppercase !important;
+        color: #000000 !important;
     }
 
     .sb-inner { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap, 16px); }
