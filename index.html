@@ -83,7 +83,7 @@
         .sb-input{width:100%;box-sizing:border-box;padding:14px;border-radius:12px;border:2px solid #cbd5e1;font-size:18px;text-align:center;color:#0f172a}
         .sb-err{color:#dc2626;font-size:13px;min-height:18px;margin-top:8px}
     
-.sb-page {
+        .sb-page {
         position: fixed;
         inset: 0;
         z-index: 50;
@@ -98,7 +98,7 @@
     }
     .sb-page.hidden, .sb-modal.hidden, .sb-pill.hidden { display: none !important; }
 
-    /* CSS Baru untuk Baris Info Pemilih & Tombol Batal di Atas (Latar Merah) */
+    /* Baris Info Pemilih & Tombol Batal (Latar Merah) */
     .sb-top-voter {
         width: 100%;
         background: #dc2626; 
@@ -124,17 +124,33 @@
         box-shadow: 0 2px 8px rgba(0,0,0,0.15);
     }
 
-    /* Mengatur urutan tata letak elemen di halaman voting secara otomatis */
-    .sb-top-voter { order: 1; }  /* 1. Paling atas: Info pemilih & tombol Batal merah */
-    .sb-logos     { order: 2; margin: 14px auto 6px !important; display: flex !important; justify-content: center; align-items: center; gap: 12px; flex-shrink: 0; } /* 2. Di bawah info pemilih: Logo */
-    .sb-head      { order: 3; text-align: center; padding: 0 16px; flex-shrink: 0; } /* 3. Di bawah logo: Judul Surat Suara */
-    .sb-grid      { order: 4; flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px 16px; min-height: 0; } /* 4. Kartu kandidat */
-    .sb-foot      { order: 5; padding: 10px 16px 16px; flex-shrink: 0; text-align: center; } /* 5. Footer petunjuk */
+    /* Urutan Tata Letak Elemen */
+    .sb-top-voter { order: 1; }  
+    .sb-logos     { order: 2; margin: 12px auto 4px !important; display: flex !important; justify-content: center; align-items: center; gap: 12px; flex-shrink: 0; } 
+    .sb-head      { order: 3; text-align: center; padding: 0 16px; flex-shrink: 0; } 
+    .sb-grid      { order: 4; flex: 1; display: flex; align-items: center; justify-content: center; padding: 10px 16px; min-height: 0; } 
+    .sb-foot      { order: 5; padding: 10px 16px 16px; flex-shrink: 0; text-align: center; } 
 
     .sb-head.nologo { padding-top: 2vh; }
-    .sb-logos img { height: min(9vh, 12vw); width: auto; max-width: 28vw; object-fit: contain; }
-    .sb-h1 { font-size: min(5vh, 5vw); letter-spacing: .02em; line-height: 1.05; }
-    .sb-h2 { font-size: min(2.1vh, 2.7vw); letter-spacing: .03em; line-height: 1.3; }
+    .sb-logos img { height: min(8vh, 10vw); width: auto; max-width: 25vw; object-fit: contain; }
+    
+    /* SURAT SUARA: Ukuran diperbesar dan tebal */
+    .sb-h1 { 
+        font-size: min(7vh, 7vw); 
+        font-weight: 800; 
+        letter-spacing: .03em; 
+        line-height: 1.1; 
+    }
+    
+    /* Teks Wilayah (Desa, Kecamatan, Kabupaten, Tahun): Semua Bold dan Ukuran Sama */
+    .sb-h2 { 
+        font-size: min(2.4vh, 3vw); 
+        font-weight: 700; 
+        letter-spacing: .02em; 
+        line-height: 1.35; 
+        text-transform: uppercase;
+    }
+
     .sb-inner { display: flex; flex-wrap: wrap; justify-content: center; gap: var(--gap, 16px); }
     .sb-card { box-sizing: border-box; width: var(--cw); flex: 0 0 var(--cw); padding: calc(var(--cw)*.04); border: calc(var(--cw)*.012 + 1px) solid #231f20; background: #fff; text-align: center; cursor: pointer; -webkit-tap-highlight-color: transparent; transition: opacity .15s, transform .12s, border-color .12s, box-shadow .12s; }
     .sb-no { font-size: calc(var(--cw)*.15); font-weight: 800; line-height: 1.1; }
