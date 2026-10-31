@@ -400,22 +400,24 @@
     
 
     <!-- 3. CONFIRM VOTE MODAL -->
-        <div id="modal-confirm-vote" class="hidden sb-modal sb-cf-back">
-        <div class="sb-cf">
+    <div id="modal-confirm-vote" class="hidden sb-modal sb-cf-back">
+        <div class="sb-cf" style="max-width: 520px; padding: 32px 28px;">
             <div class="sb-cf-ico"><i class="fa-solid fa-check-double"></i></div>
-            <h2 class="sb-cf-title">Konfirmasi Coblos Suara</h2>
-            <p class="sb-cf-text">Apakah Anda yakin hendak memilih pasangan calon berikut? Pilihan tidak dapat diubah setelah dikonfirmasi.</p>
-            <div class="sb-cf-card">
-                <img id="cf-img" alt="" onerror="this.onerror=null;this.src=PH">
-                <div>
-                    <div class="sb-cf-no" id="cf-no">Calon nomor urut 01</div>
-                    <div class="sb-cf-name" id="cf-name">-</div>
-                    <div class="sb-cf-slogan" id="cf-slogan"></div>
+            <h2 class="sb-cf-title" style="font-size: 26px;">Konfirmasi Coblos Suara</h2>
+            <p class="sb-cf-text" style="font-size: 14px;">Apakah Anda yakin hendak memilih calon berikut? Pilihan tidak dapat diubah setelah dikonfirmasi.</p>
+            
+            <!-- Blok Kartu Calon (Menyerupai Surat Suara: Foto & Nama, Tanpa Visi Misi) -->
+            <div style="display: flex; align-items: center; justify-content: center; background: #ffffff; border: 3px solid #00a0e9; border-radius: 20px; padding: 18px; margin-bottom: 24px; color: #0f172a; gap: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
+                <img id="cf-img" alt="" onerror="this.onerror=null;this.src=PH" style="width: 120px; height: 160px; object-fit: cover; border-radius: 12px; border: 2px solid #231f20; background: #e5e7eb;">
+                <div style="text-align: left;">
+                    <div id="cf-no" style="font-size: 13px; letter-spacing: 0.1em; font-weight: 800; color: #2563eb; text-transform: uppercase; margin-bottom: 4px;">Calon nomor urut 01</div>
+                    <div id="cf-name" style="font-size: 24px; font-weight: 800; text-transform: uppercase; line-height: 1.2; color: #0f172a;">-</div>
                 </div>
             </div>
-            <div class="sb-cf-btns">
-                <button type="button" class="sb-cf-cancel" onclick="closeConfirmVoteModal()">Batal</button>
-                <button type="button" class="sb-cf-ok" onclick="submitVote()"><i class="fa-solid fa-check"></i> <span id="confirm-btn-label">Simpan &amp; Cetak Hasil</span></button>
+    
+            <div class="sb-cf-btns" style="gap: 14px;">
+                <button type="button" class="sb-cf-cancel" style="padding: 16px; font-size: 16px;" onclick="closeConfirmVoteModal()">Batal</button>
+                <button type="button" class="sb-cf-ok" style="padding: 16px; font-size: 16px;" onclick="submitVote()"><i class="fa-solid fa-check"></i> <span id="confirm-btn-label">Simpan &amp; Cetak Hasil</span></button>
             </div>
         </div>
     </div>
