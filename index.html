@@ -969,7 +969,7 @@
             document.querySelectorAll('#sb-inner .sb-card').forEach(el => el.classList.toggle('sel', el.dataset.id === c.id));
             document.getElementById('voting-candidates-grid').classList.add('has-sel');
             
-            // Mengisi data ke modal konfirmasi (Tanpa Visi Misi)
+            // Mengisi data ke modal konfirmasi (Angka besar di atas, foto di tengah, nama di bawah)
             document.getElementById('cf-img').src = c.photo;
             document.getElementById('cf-no').textContent = parseInt(c.number, 10) || c.number; // Menampilkan angka nomor urut saja secara besar
             document.getElementById('cf-name').textContent = c.name;
