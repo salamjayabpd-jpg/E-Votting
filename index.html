@@ -163,10 +163,46 @@
     .sb-pill { background: #00a0e9; color: #fff; border-radius: 999px; min-height: 8vh; display: flex; align-items: center; justify-content: center; font-weight: 800; font-size: min(3.3vh, 4vw); text-align: center; padding: 0 3vw; margin: 0 auto; }
     
     .sb-cf-back { background: rgba(2,6,23,.78); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
-    .sb-cf { width: 100%; max-width: 460px; background: linear-gradient(160deg,#1e293b,#172036); border: 1px solid #334155; border-radius: 28px; padding: 28px 24px; text-align: center; color: #fff; box-shadow: 0 25px 60px rgba(0,0,0,.5); font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-    .sb-cf-ico { width: 64px; height: 64px; border-radius: 50%; margin: 0 auto 14px; background: rgba(245,158,11,.15); border: 2px solid rgba(245,158,11,.45); color: #fbbf24; font-size: 26px; display: flex; align-items: center; justify-content: center; }
-    .sb-cf-title { font-size: 24px; font-weight: 800; margin: 0 0 8px; }
-    .sb-cf-text { font-size: 13px; line-height: 1.5; color: #cbd5e1; margin: 0 0 16px; }
+    /* Kotak Dialog Konfirmasi dengan Latar Belakang Putih Bersih */
+    .sb-cf {
+        width: 100%;
+        max-width: 480px;
+        background: #ffffff !important; /* Mengubah latar belakang menjadi putih */
+        border: 1px solid #e2e8f0;
+        border-radius: 28px;
+        padding: 32px 28px;
+        text-align: center;
+        color: #0f172a !important; /* Mengubah warna teks utama menjadi gelap/hitam agar kontras */
+        box-shadow: 0 25px 60px rgba(0,0,0,0.35);
+        font-family: 'Plus Jakarta Sans', system-ui, sans-serif;
+    }
+    .sb-cf-ico {
+        width: 64px;
+        height: 64px;
+        border-radius: 50%;
+        margin: 0 auto 14px;
+        background: rgba(37,99,235,0.1);
+        border: 2px solid rgba(37,99,235,0.3);
+        color: #2563eb;
+        font-size: 26px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+    
+    .sb-cf-title {
+        font-size: 26px;
+        font-weight: 800;
+        margin: 0 0 8px;
+        color: #0f172a !important;
+    }
+    
+    .sb-cf-text {
+        font-size: 14px;
+        line-height: 1.5;
+        color: #64748b !important; /* Warna teks deskripsi abu-abu gelap */
+        margin: 0 0 24px;
+    }
     .sb-cf-card { display: flex; gap: 14px; align-items: center; text-align: left; background: #2b3a52; border: 1px solid #3b4b66; border-radius: 18px; padding: 14px; margin-bottom: 18px; }
     .sb-cf-card img { width: 72px; height: 92px; object-fit: cover; border-radius: 12px; border: 2px solid #475569; flex: 0 0 auto; background: #e5e7eb; }
     .sb-cf-no { font-size: 11px; letter-spacing: .14em; font-weight: 800; color: #60a5fa; text-transform: uppercase; }
@@ -401,23 +437,28 @@
 
     <!-- 3. CONFIRM VOTE MODAL -->
     <div id="modal-confirm-vote" class="hidden sb-modal sb-cf-back">
-        <div class="sb-cf" style="max-width: 520px; padding: 32px 28px;">
+        <div class="sb-cf" style="max-width: 440px; background: #ffffff !important; border-radius: 28px; padding: 28px 24px; text-align: center; color: #0f172a; box-shadow: 0 25px 60px rgba(0,0,0,0.35);">
             <div class="sb-cf-ico"><i class="fa-solid fa-check-double"></i></div>
-            <h2 class="sb-cf-title" style="font-size: 26px;">Konfirmasi Coblos Suara</h2>
-            <p class="sb-cf-text" style="font-size: 14px;">Apakah Anda yakin hendak memilih calon berikut? Pilihan tidak dapat diubah setelah dikonfirmasi.</p>
+            <h2 class="sb-cf-title" style="font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Konfirmasi Coblos Suara</h2>
+            <p class="sb-cf-text" style="font-size: 13px; color: #64748b; margin-bottom: 20px;">Apakah Anda yakin hendak memilih calon berikut? Pilihan tidak dapat diubah setelah dikonfirmasi.</p>
             
-            <!-- Blok Kartu Calon (Menyerupai Surat Suara: Foto & Nama, Tanpa Visi Misi) -->
-            <div style="display: flex; align-items: center; justify-content: center; background: #ffffff; border: 3px solid #00a0e9; border-radius: 20px; padding: 18px; margin-bottom: 24px; color: #0f172a; gap: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);">
-                <img id="cf-img" alt="" onerror="this.onerror=null;this.src=PH" style="width: 120px; height: 160px; object-fit: cover; border-radius: 12px; border: 2px solid #231f20; background: #e5e7eb;">
-                <div style="text-align: left;">
-                    <div id="cf-no" style="font-size: 13px; letter-spacing: 0.1em; font-weight: 800; color: #2563eb; text-transform: uppercase; margin-bottom: 4px;">Calon nomor urut 01</div>
-                    <div id="cf-name" style="font-size: 24px; font-weight: 800; text-transform: uppercase; line-height: 1.2; color: #0f172a;">-</div>
+            <!-- Tampilan Kartu Kandidat Vertikal (Persis seperti Surat Suara) -->
+            <div style="background: #ffffff; border: 3px solid #231f20; border-radius: 16px; padding: 16px; margin-bottom: 24px; display: inline-block; width: 220px; box-shadow: 0 8px 20px rgba(0,0,0,0.08);">
+                <!-- Nomor Urut di Atas Foto -->
+                <div id="cf-no" style="font-size: 28px; font-weight: 800; color: #231f20; margin-bottom: 10px; line-height: 1;">2</div>
+                
+                <!-- Foto Kandidat -->
+                <div style="width: 100%; aspect-ratio: 3/4; border: 1px solid #231f20; background: #e5e7eb; overflow: hidden; border-radius: 4px; margin-bottom: 12px;">
+                    <img id="cf-img" alt="" onerror="this.onerror=null;this.src=PH" style="width: 100%; height: 100%; object-fit: cover; display: block;">
                 </div>
+                
+                <!-- Nama Kandidat di Bawah Foto -->
+                <div id="cf-name" style="font-size: 15px; font-weight: 800; text-transform: uppercase; color: #231f20; line-height: 1.2; min-height: 36px; display: flex; align-items: center; justify-content: center;">DEWI AMELIA</div>
             </div>
     
-            <div class="sb-cf-btns" style="gap: 14px;">
-                <button type="button" class="sb-cf-cancel" style="padding: 16px; font-size: 16px;" onclick="closeConfirmVoteModal()">Batal</button>
-                <button type="button" class="sb-cf-ok" style="padding: 16px; font-size: 16px;" onclick="submitVote()"><i class="fa-solid fa-check"></i> <span id="confirm-btn-label">Simpan &amp; Cetak Hasil</span></button>
+            <div class="sb-cf-btns" style="display: flex; gap: 12px;">
+                <button type="button" class="sb-cf-cancel" style="flex: 1; padding: 14px; border-radius: 14px; border: 0; background: #dc2626; color: #fff; font-weight: 800; font-size: 15px;" onclick="closeConfirmVoteModal()">Batal</button>
+                <button type="button" class="sb-cf-ok" style="flex: 1.6; padding: 14px; border-radius: 14px; border: 0; background: #059669; color: #fff; font-weight: 800; font-size: 15px;" onclick="submitVote()"><i class="fa-solid fa-check"></i> <span id="confirm-btn-label">Simpan</span></button>
             </div>
         </div>
     </div>
