@@ -442,10 +442,10 @@
             <h2 class="sb-cf-title" style="font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Konfirmasi Coblos Suara</h2>
             <p class="sb-cf-text" style="font-size: 13px; color: #64748b; margin-bottom: 20px;">Apakah Anda yakin hendak memilih calon berikut? Pilihan tidak dapat diubah setelah dikonfirmasi.</p>
             
-            <!-- Tampilan Kartu Kandidat Vertikal (Persis seperti Surat Suara) -->
+            <!-- Tampilan Kartu Kandidat: Nomor di Atas, Foto di Tengah, Nama di Bawah -->
             <div style="background: #ffffff; border: 3px solid #231f20; border-radius: 16px; padding: 16px; margin-bottom: 24px; display: inline-block; width: 220px; box-shadow: 0 8px 20px rgba(0,0,0,0.08);">
-                <!-- Nomor Urut di Atas Foto -->
-                <div id="cf-no" style="font-size: 28px; font-weight: 800; color: #231f20; margin-bottom: 10px; line-height: 1;">2</div>
+                <!-- Angka Nomor Urut Besar di Atas Foto -->
+                <div id="cf-no" style="font-size: 36px; font-weight: 800; color: #231f20; margin-bottom: 8px; line-height: 1;">1</div>
                 
                 <!-- Foto Kandidat -->
                 <div style="width: 100%; aspect-ratio: 3/4; border: 1px solid #231f20; background: #e5e7eb; overflow: hidden; border-radius: 4px; margin-bottom: 12px;">
@@ -453,12 +453,12 @@
                 </div>
                 
                 <!-- Nama Kandidat di Bawah Foto -->
-                <div id="cf-name" style="font-size: 15px; font-weight: 800; text-transform: uppercase; color: #231f20; line-height: 1.2; min-height: 36px; display: flex; align-items: center; justify-content: center;">DEWI AMELIA</div>
+                <div id="cf-name" style="font-size: 15px; font-weight: 800; text-transform: uppercase; color: #231f20; line-height: 1.2; min-height: 36px; display: flex; align-items: center; justify-content: center;">-</div>
             </div>
     
             <div class="sb-cf-btns" style="display: flex; gap: 12px;">
                 <button type="button" class="sb-cf-cancel" style="flex: 1; padding: 14px; border-radius: 14px; border: 0; background: #dc2626; color: #fff; font-weight: 800; font-size: 15px;" onclick="closeConfirmVoteModal()">Batal</button>
-                <button type="button" class="sb-cf-ok" style="flex: 1.6; padding: 14px; border-radius: 14px; border: 0; background: #059669; color: #fff; font-weight: 800; font-size: 15px;" onclick="submitVote()"><i class="fa-solid fa-check"></i> <span id="confirm-btn-label">Simpan</span></button>
+                <button type="button" class="sb-cf-ok" style="flex: 1.6; padding: 14px; border-radius: 14px; border: 0; background: #059669; color: #fff; font-weight: 800; font-size: 15px;" onclick="submitVote()"><i class="fa-solid fa-check"></i> <span id="confirm-btn-label">Simpan &amp; Cetak Hasil</span></button>
             </div>
         </div>
     </div>
@@ -971,7 +971,7 @@
             
             // Mengisi data ke modal konfirmasi (Tanpa Visi Misi)
             document.getElementById('cf-img').src = c.photo;
-            document.getElementById('cf-no').textContent = 'Calon nomor urut ' + String(c.number).padStart(2, '0');
+            document.getElementById('cf-no').textContent = parseInt(c.number, 10) || c.number; // Menampilkan angka nomor urut saja secara besar
             document.getElementById('cf-name').textContent = c.name;
             
             document.getElementById('confirm-btn-label').textContent = slipOn() ? 'Simpan & Cetak Hasil' : 'Simpan Pilihan';
