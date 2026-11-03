@@ -676,8 +676,11 @@
            - Android  -> kirim ESC/POS langsung ke aplikasi RawBT (tanpa dialog print browser)
            - Selain Android / Mode_Cetak = "browser" -> memakai window.print() seperti sebelumnya */
         function useRawBT() {
-            if (String(appSet.Mode_Cetak || '').trim().toLowerCase() === 'browser') return false;
-            return /Android/i.test(navigator.userAgent);
+            const mode = String(appSet.Mode_Cetak || '').trim().toLowerCase();
+            if (mode === 'browser') return false;
+            if (mode === 'rawbt') return true;
+            const uad = navigator.userAgentData;
+            return /Android/i.test(navigator.userAgent) || !!(uad && uad.platform === 'Android');
         }
         function toAscii(s) {
             return String(s == null ? '' : s).normalize('NFD').replace(/[^\x20-\x7E]/g, '');
@@ -798,12 +801,7 @@
                 for (let i = 0; i < bytes.length; i += 0x8000) {
                     bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
                 }
-                const a = document.createElement('a');
-                a.href = 'intent:base64,' + btoa(bin) + '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;';
-                a.style.display = 'none';
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => a.remove(), 500);
+                window.location.href = 'rawbt:base64,' + btoa(bin);
                 return true;
             } catch (err) {
                 console.error('Gagal mengirim ke RawBT:', err);
@@ -831,27 +829,9 @@
             try { bytes = renderSlipRaster(slip); } catch (e) { console.error('Raster struk gagal:', e); }
             if (!bytes) bytes = buildSlipBytes(slip);   // cadangan: struk teks + QR bawaan printer
 
-            let fin = false;
-            const finish = () => { if (fin) return; fin = true; if (done) done(); };
-
-            // Chrome hanya mengizinkan intent bila ada interaksi pengguna yang masih aktif.
-            // Bila sudah kedaluwarsa (server lambat), tampilkan tombol ketuk agar tetap bisa mencetak.
-            const active = !navigator.userActivation || navigator.userActivation.isActive;
-            if (active) {
-                sendToRawBT(bytes);
-                setTimeout(finish, 1500);
-                return;
-            }
-            const sub = document.getElementById('thanks-sub');
-            if (sub) sub.textContent = 'Ketuk tombol di bawah untuk mencetak struk.';
-            const btn = document.createElement('button');
-            btn.type = 'button';
-            btn.textContent = 'CETAK STRUK';
-            btn.className = 'sb-btn-pri';
-            btn.style.cssText = 'margin-top:16px;padding:14px 28px;flex:none';
-            btn.onclick = () => { sendToRawBT(bytes); btn.remove(); setTimeout(finish, 1500); };
-            if (sub && sub.parentNode) sub.parentNode.appendChild(btn);
-            setTimeout(finish, 60000);
+            const ok2 = sendToRawBT(bytes);
+            if (!ok2) alert('Gagal mengirim struk ke RawBT. Pastikan aplikasi RawBT terpasang.');
+            setTimeout(() => { if (done) done(); }, 1500);
         }
         let currentPage = 'voterlogin';
         function fsOn() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
