@@ -618,15 +618,13 @@
             s.textContent = '@media print{' + css + '}';
         }
         /* Struk audit 58 mm: hanya pilihan calon, TANPA nama/NIK pemilih (menjaga kerahasiaan) */
-		function printVoteSlip(c, done, kode, tps, voteTime) {
+        function printVoteSlipBrowser(c, done, kode, tps, voteTime) {
             const test = !c;
-            const desa = (appSet.Nama_Desa || 'SALAMJAYA').toUpperCase();
+            const desa = (appSet.Nama_Desa || 'Salamjaya').toUpperCase();
+            const tpsNo = tps || '1';
             
-            // Memastikan nomor TPS yang diterima tidak kosong
-            const tpsNo = tps ? String(tps).trim() : '1';
-            
-            // Format tanggal dan jam presisi
-            const timeStr = voteTime ? new Date(voteTime).toLocaleString('id-ID', { 
+            // Format tanggal dan jam presisi (contoh: 01/11/2026, 04.30.15)
+            const timeStr = voteTime ? voteTime.toLocaleString('id-ID', { 
                 day: '2-digit', month: '2-digit', year: 'numeric', 
                 hour: '2-digit', minute: '2-digit', second: '2-digit', 
                 hour12: false 
@@ -634,38 +632,150 @@
 
             if (test) {
                 kode = 'CONTOH' + Math.random().toString(36).slice(2, 6).toUpperCase();
+                voteTime = new Date();
             }
             const ok = !!kode;
 
-            // Menyusun format teks struk thermal (Standar ESC/POS untuk RawBT)
-            let printText = "";
-            printText += "       SALINAN SUARA SAH       \n";
-            printText += "     PILKADES DESA " + desa + "     \n";
-            printText += "       TPS : " + tpsNo + "             \n";
-            printText += "--------------------------------\n";
-            printText += "Waktu: " + timeStr + "\n";
-            printText += "--------------------------------\n";
-            printText += " KODE AUDIT / KODE UNIK:\n";
-            printText += " " + (ok ? kode : "KODE TIDAK TERSEDIA") + "\n";
-            printText += "--------------------------------\n";
-            printText += "  Masukkan ke kotak audit.      \n";
-            printText += "  Jangan dibawa pulang.         \n";
-			// --- PERBAIKAN DI SINI ---
-			printText += "\n\n";                // Sisakan sedikit jeda baris wajar (2 baris saja)
-			printText += "\x1D\x56\x41\x10";     // Perintah ESC/POS untuk Auto-Cut (Potong kertas otomatis)
+            // Data lengkap yang otomatis tersemat di dalam QR Code untuk keperluan audit
+            const qrPayload = ok ? JSON.stringify({
+                kode: kode,
+                desa: desa,
+                tps: tpsNo,
+                waktu: timeStr
+            }) : '';
 
-            // Mengirim data langsung ke aplikasi RawBT di Android secara otomatis
-            try {
-                const base64Data = btoa(unescape(encodeURIComponent(printText)));
-                window.location.href = "rawbt:base64," + base64Data;
-            } catch (err) {
-                console.error("Gagal mencetak otomatis via RawBT:", err);
+            document.getElementById('print-area').innerHTML = `
+                <style>#slip-qr img,#slip-qr canvas{width:100%!important;height:100%!important}</style>
+                <div style="width:48mm;margin:0 auto;text-align:center;font-family:Arial,sans-serif;color:#000;padding:2mm 0">
+                    ${test ? '<div style="font-weight:bold;font-size:12px">*** CONTOH / TIDAK SAH ***</div>' : ''}
+                    <div style="font-weight:bold;font-size:13px">SALINAN SUARA SAH</div>
+                    <div style="font-size:11px">PILKADES DESA ${esc(desa)}</div>
+                    <div style="font-size:10px;font-weight:bold;margin-top:1mm">TPS: ${esc(tpsNo)}</div>
+                    <div style="font-size:9px;margin-bottom:1mm">${esc(timeStr)}</div>
+                    <div style="border-top:1px dashed #000;margin:2mm 0"></div>
+                    ${ok ? `<div id="slip-qr" style="width:34mm;height:34mm;margin:0 auto"></div>
+                    <div style="font-family:'Courier New',monospace;font-weight:bold;font-size:13px;margin-top:1mm;letter-spacing:1px">${esc(kode)}</div>`
+                        : '<div style="font-weight:bold;font-size:12px;padding:6mm 0">KODE STRUK TIDAK TERSEDIA<br>HUBUNGI PANITIA</div>'}
+                    <div style="border-top:1px dashed #000;margin:2mm 0"></div>
+                    <div style="font-size:9px">Masukkan ke kotak audit.<br>Jangan dibawa pulang.</div>
+                </div>`;
+            
+            if (ok && typeof QRCode !== 'undefined') {
+                const lvl = (QRCode.CorrectLevel || {}).M;
+                // Memasukkan qrPayload (berisi kode, desa, tps, dan waktu) ke dalam QR Code
+                new QRCode(document.getElementById('slip-qr'), Object.assign({ text: qrPayload, width: 128, height: 128 }, lvl !== undefined ? { correctLevel: lvl } : {}));
             }
+            setPage('@page { size: 58mm auto; margin: 0; }');
+            let fin = false;
+            const end = () => { if (fin) return; fin = true; window.removeEventListener('afterprint', end); if (done) done(); };
+            window.addEventListener('afterprint', end);
+            setTimeout(end, 15000);
+            setTimeout(() => window.print(), 500);
+        }
+        /* ===== CETAK OTOMATIS PRINTER TERMAL (Android + RawBT, ESC/POS) =====
+           - Android  -> kirim ESC/POS langsung ke aplikasi RawBT (tanpa dialog print browser)
+           - Selain Android / Mode_Cetak = "browser" -> memakai window.print() seperti sebelumnya */
+        function useRawBT() {
+            if (String(appSet.Mode_Cetak || '').trim().toLowerCase() === 'browser') return false;
+            return /Android/i.test(navigator.userAgent);
+        }
+        function toAscii(s) {
+            return String(s == null ? '' : s).normalize('NFD').replace(/[^\x20-\x7E]/g, '');
+        }
+        function buildSlipBytes(o) {
+            const out = [];
+            const raw = (...b) => { for (const x of b) out.push(x); };
+            const txt = s => { new TextEncoder().encode(toAscii(s)).forEach(x => out.push(x)); };
+            const align = n => raw(0x1B, 0x61, n);   // 0 kiri, 1 tengah
+            const bold = n => raw(0x1B, 0x45, n);
+            const LINE = '--------------------------------\n'; // 32 kolom = kertas 58 mm
+            raw(0x1B, 0x40);                          // reset printer
+            align(1); bold(1);
+            if (o.test) txt('*** CONTOH / TIDAK SAH ***\n');
+            txt('SALINAN SUARA SAH\n');
+            txt('PILKADES DESA ' + o.desa + '\n');
+            txt('TPS : ' + o.tps + '\n');
+            bold(0);
+            txt(o.waktu + '\n');
+            align(0); txt(LINE); align(1);
+            if (o.kode) {
+                // QR Code native ESC/POS (GS ( k)
+                const data = new TextEncoder().encode(o.qr);
+                const n = data.length + 3;
+                raw(0x1D, 0x28, 0x6B, 0x04, 0x00, 0x31, 0x41, 0x32, 0x00); // model 2
+                raw(0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x43, 5);          // ukuran modul 5
+                raw(0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x45, 0x31);       // koreksi level M
+                raw(0x1D, 0x28, 0x6B, n & 255, n >> 8, 0x31, 0x50, 0x30);  // simpan data
+                data.forEach(x => out.push(x));
+                raw(0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x51, 0x30);       // cetak QR
+                txt('\n'); bold(1); txt(o.kode + '\n'); bold(0);
+            } else {
+                bold(1); txt('KODE STRUK TIDAK TERSEDIA\nHUBUNGI PANITIA\n'); bold(0);
+            }
+            align(0); txt(LINE); align(1);
+            txt('Masukkan ke kotak audit.\nJangan dibawa pulang.\n');
+            align(0);
+            txt('\n\n\n');
+            raw(0x1D, 0x56, 0x42, 0x03);              // feed + potong (diabaikan bila tanpa cutter)
+            return new Uint8Array(out);
+        }
+        function sendToRawBT(bytes) {
+            try {
+                let bin = '';
+                for (let i = 0; i < bytes.length; i += 0x8000) {
+                    bin += String.fromCharCode.apply(null, bytes.subarray(i, i + 0x8000));
+                }
+                const a = document.createElement('a');
+                a.href = 'intent:base64,' + btoa(bin) + '#Intent;scheme=rawbt;package=ru.a402d.rawbtprinter;end;';
+                a.style.display = 'none';
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => a.remove(), 500);
+                return true;
+            } catch (err) {
+                console.error('Gagal mengirim ke RawBT:', err);
+                return false;
+            }
+        }
+        function printVoteSlip(c, done, kode, tps, voteTime) {
+            if (!useRawBT()) return printVoteSlipBrowser(c, done, kode, tps, voteTime);
 
-            // Selesai dan kembali ke halaman login
-            setTimeout(() => {
-                if (done) done();
-            }, 1000);
+            const test = !c;
+            const desa = (appSet.Nama_Desa || 'Salamjaya').toUpperCase();
+            const tpsNo = tps ? String(tps).trim() : '1';
+            const vt = voteTime ? new Date(voteTime) : new Date();
+            const waktu = vt.toLocaleString('id-ID', {
+                day: '2-digit', month: '2-digit', year: 'numeric',
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+            });
+            if (test) kode = 'CONTOH' + Math.random().toString(36).slice(2, 6).toUpperCase();
+
+            const bytes = buildSlipBytes({
+                test, desa, tps: tpsNo, waktu, kode,
+                qr: kode ? JSON.stringify({ kode, desa, tps: tpsNo, waktu }) : ''
+            });
+
+            let fin = false;
+            const finish = () => { if (fin) return; fin = true; if (done) done(); };
+
+            // Chrome hanya mengizinkan intent bila ada interaksi pengguna yang masih aktif.
+            // Bila sudah kedaluwarsa (server lambat), tampilkan tombol ketuk agar tetap bisa mencetak.
+            const active = !navigator.userActivation || navigator.userActivation.isActive;
+            if (active) {
+                sendToRawBT(bytes);
+                setTimeout(finish, 1500);
+                return;
+            }
+            const sub = document.getElementById('thanks-sub');
+            if (sub) sub.textContent = 'Ketuk tombol di bawah untuk mencetak struk.';
+            const btn = document.createElement('button');
+            btn.type = 'button';
+            btn.textContent = 'CETAK STRUK';
+            btn.className = 'sb-btn-pri';
+            btn.style.cssText = 'margin-top:16px;padding:14px 28px;flex:none';
+            btn.onclick = () => { sendToRawBT(bytes); btn.remove(); setTimeout(finish, 1500); };
+            if (sub && sub.parentNode) sub.parentNode.appendChild(btn);
+            setTimeout(finish, 60000);
         }
         let currentPage = 'voterlogin';
         function fsOn() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
