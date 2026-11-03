@@ -618,13 +618,15 @@
             s.textContent = '@media print{' + css + '}';
         }
         /* Struk audit 58 mm: hanya pilihan calon, TANPA nama/NIK pemilih (menjaga kerahasiaan) */
-        function printVoteSlip(c, done, kode, tps, voteTime) {
+		function printVoteSlip(c, done, kode, tps, voteTime) {
             const test = !c;
-            const desa = (appSet.Nama_Desa || 'Salamjaya').toUpperCase();
-            const tpsNo = tps || '1';
+            const desa = (appSet.Nama_Desa || 'SALAMJAYA').toUpperCase();
             
-            // Format tanggal dan jam presisi (contoh: 01/11/2026, 04.30.15)
-            const timeStr = voteTime ? voteTime.toLocaleString('id-ID', { 
+            // Memastikan nomor TPS yang diterima tidak kosong
+            const tpsNo = tps ? String(tps).trim() : '1';
+            
+            // Format tanggal dan jam presisi
+            const timeStr = voteTime ? new Date(voteTime).toLocaleString('id-ID', { 
                 day: '2-digit', month: '2-digit', year: 'numeric', 
                 hour: '2-digit', minute: '2-digit', second: '2-digit', 
                 hour12: false 
@@ -632,45 +634,36 @@
 
             if (test) {
                 kode = 'CONTOH' + Math.random().toString(36).slice(2, 6).toUpperCase();
-                voteTime = new Date();
             }
             const ok = !!kode;
 
-            // Data lengkap yang otomatis tersemat di dalam QR Code untuk keperluan audit
-            const qrPayload = ok ? JSON.stringify({
-                kode: kode,
-                desa: desa,
-                tps: tpsNo,
-                waktu: timeStr
-            }) : '';
+            // Menyusun format teks struk thermal (Standar ESC/POS untuk RawBT)
+            let printText = "";
+            printText += "       SALINAN SUARA SAH       \n";
+            printText += "     PILKADES DESA " + desa + "     \n";
+            printText += "       TPS : " + tpsNo + "             \n";
+            printText += "--------------------------------\n";
+            printText += "Waktu: " + timeStr + "\n";
+            printText += "--------------------------------\n";
+            printText += " KODE AUDIT / KODE UNIK:\n";
+            printText += " " + (ok ? kode : "KODE TIDAK TERSEDIA") + "\n";
+            printText += "--------------------------------\n";
+            printText += "  Masukkan ke kotak audit.      \n";
+            printText += "  Jangan dibawa pulang.         \n";
+            printText += "\n\n\n"; // Jeda baris agar kertas bisa disobek
 
-            document.getElementById('print-area').innerHTML = `
-                <style>#slip-qr img,#slip-qr canvas{width:100%!important;height:100%!important}</style>
-                <div style="width:48mm;margin:0 auto;text-align:center;font-family:Arial,sans-serif;color:#000;padding:2mm 0">
-                    ${test ? '<div style="font-weight:bold;font-size:12px">*** CONTOH / TIDAK SAH ***</div>' : ''}
-                    <div style="font-weight:bold;font-size:13px">SALINAN SUARA SAH</div>
-                    <div style="font-size:11px">PILKADES DESA ${esc(desa)}</div>
-                    <div style="font-size:10px;font-weight:bold;margin-top:1mm">TPS: ${esc(tpsNo)}</div>
-                    <div style="font-size:9px;margin-bottom:1mm">${esc(timeStr)}</div>
-                    <div style="border-top:1px dashed #000;margin:2mm 0"></div>
-                    ${ok ? `<div id="slip-qr" style="width:34mm;height:34mm;margin:0 auto"></div>
-                    <div style="font-family:'Courier New',monospace;font-weight:bold;font-size:13px;margin-top:1mm;letter-spacing:1px">${esc(kode)}</div>`
-                        : '<div style="font-weight:bold;font-size:12px;padding:6mm 0">KODE STRUK TIDAK TERSEDIA<br>HUBUNGI PANITIA</div>'}
-                    <div style="border-top:1px dashed #000;margin:2mm 0"></div>
-                    <div style="font-size:9px">Masukkan ke kotak audit.<br>Jangan dibawa pulang.</div>
-                </div>`;
-            
-            if (ok && typeof QRCode !== 'undefined') {
-                const lvl = (QRCode.CorrectLevel || {}).M;
-                // Memasukkan qrPayload (berisi kode, desa, tps, dan waktu) ke dalam QR Code
-                new QRCode(document.getElementById('slip-qr'), Object.assign({ text: qrPayload, width: 128, height: 128 }, lvl !== undefined ? { correctLevel: lvl } : {}));
+            // Mengirim data langsung ke aplikasi RawBT di Android secara otomatis
+            try {
+                const base64Data = btoa(unescape(encodeURIComponent(printText)));
+                window.location.href = "rawbt:base64," + base64Data;
+            } catch (err) {
+                console.error("Gagal mencetak otomatis via RawBT:", err);
             }
-            setPage('@page { size: 58mm auto; margin: 0; }');
-            let fin = false;
-            const end = () => { if (fin) return; fin = true; window.removeEventListener('afterprint', end); if (done) done(); };
-            window.addEventListener('afterprint', end);
-            setTimeout(end, 15000);
-            setTimeout(() => window.print(), 500);
+
+            // Selesai dan kembali ke halaman login
+            setTimeout(() => {
+                if (done) done();
+            }, 1000);
         }
         let currentPage = 'voterlogin';
         function fsOn() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
