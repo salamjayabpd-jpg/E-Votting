@@ -650,7 +650,9 @@
             printText += "--------------------------------\n";
             printText += "  Masukkan ke kotak audit.      \n";
             printText += "  Jangan dibawa pulang.         \n";
-            printText += "\n\n\n"; // Jeda baris agar kertas bisa disobek
+			// --- PERBAIKAN DI SINI ---
+			printText += "\n\n";                // Sisakan sedikit jeda baris wajar (2 baris saja)
+			printText += "\x1D\x56\x41\x10";     // Perintah ESC/POS untuk Auto-Cut (Potong kertas otomatis)
 
             // Mengirim data langsung ke aplikasi RawBT di Android secara otomatis
             try {
