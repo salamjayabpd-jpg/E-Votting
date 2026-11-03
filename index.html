@@ -716,8 +716,81 @@
             txt('Masukkan ke kotak audit.\nJangan dibawa pulang.\n');
             align(0);
             txt('\n\n\n');
-            raw(0x1D, 0x56, 0x42, 0x03);              // feed + potong (diabaikan bila tanpa cutter)
+            raw(0x1B, 0x64, 4, 0x1D, 0x56, 0x01);    // feed 4 baris + potong parsial (diabaikan bila tanpa cutter)
             return new Uint8Array(out);
+        }
+        /* Konversi piksel canvas -> bitmap ESC/POS (GS v 0), dipecah per 128 baris agar aman di buffer printer */
+        function packRaster(data, W, H) {
+            const wb = W >> 3, out = [0x1B, 0x40, 0x1B, 0x61, 0x00];
+            for (let y0 = 0; y0 < H; y0 += 128) {
+                const h = Math.min(128, H - y0);
+                out.push(0x1D, 0x76, 0x30, 0x00, wb & 255, wb >> 8, h & 255, h >> 8);
+                for (let y = y0; y < y0 + h; y++) {
+                    for (let bx = 0; bx < wb; bx++) {
+                        let b = 0;
+                        for (let k = 0; k < 8; k++) {
+                            const i = (y * W + bx * 8 + k) * 4;
+                            const lum = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+                            if (lum < 140) b |= (0x80 >> k);
+                        }
+                        out.push(b);
+                    }
+                }
+            }
+            out.push(0x1B, 0x64, 4, 0x1D, 0x56, 0x01); // feed 4 baris + potong parsial
+            return new Uint8Array(out);
+        }
+        /* Gambar struk (judul tebal, QR, kode) ke canvas lalu jadikan bitmap. Lebar 384 dot = kertas 58 mm.
+           Mengembalikan null bila QR tidak bisa dibuat -> pemanggil memakai struk teks. */
+        function renderSlipRaster(o) {
+            if (!o.kode || typeof QRCode === 'undefined') return null;
+            const W = (parseInt(appSet.Lebar_Struk_Dot, 10) || 384) & ~7;
+            const holder = document.createElement('div');
+            holder.style.cssText = 'position:fixed;left:-9999px;top:0';
+            document.body.appendChild(holder);
+            let qrCanvas = null;
+            try {
+                const lvl = (QRCode.CorrectLevel || {}).M;
+                new QRCode(holder, Object.assign({ text: o.qr, width: 264, height: 264 }, lvl !== undefined ? { correctLevel: lvl } : {}));
+                qrCanvas = holder.querySelector('canvas');
+            } catch (e) { console.error(e); }
+            if (!qrCanvas) { holder.remove(); return null; }
+
+            const cv = document.createElement('canvas');
+            cv.width = W; cv.height = 700;
+            const ctx = cv.getContext('2d', { willReadFrequently: true });
+            ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, cv.height);
+            ctx.fillStyle = '#000'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+            let y = 8;
+            const fit = (t, px, weight, fam) => {           // kecilkan font bila teks melebihi lebar
+                let f = px;
+                do { ctx.font = `${weight} ${f}px ${fam}`; f -= 1; } while (ctx.measureText(t).width > W - 16 && f > 10);
+            };
+            const line = (t, px, weight, fam, gap) => {
+                fit(t, px, weight, fam || 'Arial, Helvetica, sans-serif');
+                ctx.fillText(t, W / 2, y); y += px + (gap == null ? 6 : gap);
+            };
+            const dash = () => {
+                ctx.save(); ctx.setLineDash([6, 4]); ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(4, y + 3); ctx.lineTo(W - 4, y + 3); ctx.stroke(); ctx.restore(); y += 12;
+            };
+            if (o.test) line('*** CONTOH / TIDAK SAH ***', 20, 'bold');
+            line('SALINAN SUARA SAH', 30, 'bold', null, 8);
+            line('PILKADES DESA ' + toAscii(o.desa), 22, 'normal', null, 8);
+            line('TPS: ' + toAscii(o.tps), 26, 'bold', null, 4);
+            line(toAscii(o.waktu), 20, 'normal', null, 4);
+            dash();
+            ctx.imageSmoothingEnabled = false;
+            ctx.drawImage(qrCanvas, Math.floor((W - qrCanvas.width) / 2), y);
+            y += qrCanvas.height + 8;
+            line(toAscii(o.kode).split('').join(' '), 26, 'bold', "'Courier New', Courier, monospace", 6);
+            dash();
+            line('Masukkan ke kotak audit.', 20, 'normal', null, 2);
+            line('Jangan dibawa pulang.', 20, 'normal', null, 4);
+            const H = Math.ceil((y + 6) / 8) * 8;
+            const data = ctx.getImageData(0, 0, W, H).data;
+            holder.remove();
+            return packRaster(data, W, H);
         }
         function sendToRawBT(bytes) {
             try {
@@ -750,10 +823,13 @@
             });
             if (test) kode = 'CONTOH' + Math.random().toString(36).slice(2, 6).toUpperCase();
 
-            const bytes = buildSlipBytes({
+            const slip = {
                 test, desa, tps: tpsNo, waktu, kode,
                 qr: kode ? JSON.stringify({ kode, desa, tps: tpsNo, waktu }) : ''
-            });
+            };
+            let bytes = null;
+            try { bytes = renderSlipRaster(slip); } catch (e) { console.error('Raster struk gagal:', e); }
+            if (!bytes) bytes = buildSlipBytes(slip);   // cadangan: struk teks + QR bawaan printer
 
             let fin = false;
             const finish = () => { if (fin) return; fin = true; if (done) done(); };
