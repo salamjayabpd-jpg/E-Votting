@@ -425,6 +425,7 @@
         <div class="max-w-7xl mx-auto px-4 flex flex-col sm:flex-row items-center justify-between gap-3">
             <p>© By. R@yanet 2026 Panitia Pemilihan Kepala Desa Digital Salamjaya. Hak Cipta Dilindungi.</p>
             <button type="button" id="btn-kode" onclick="showKodeModal()" class="hidden underline text-slate-400">Kode perangkat</button>
+            <button type="button" id="btn-rekap" onclick="openRekap()" class="hidden underline text-slate-400">Rekapitulasi TPS</button>
             <p class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span> System Operational & Encrypted
             </p>
@@ -461,6 +462,20 @@
                 <button type="button" class="sb-cf-ok" style="flex: 1.6; padding: 14px; border-radius: 14px; border: 0; background: #059669; color: #fff; font-weight: 800; font-size: 15px;" onclick="submitVote()"><i class="fa-solid fa-check"></i> <span id="confirm-btn-label">Simpan &amp; Cetak Hasil</span></button>
             </div>
         </div>
+    </div>
+    <div id="modal-rekap" class="hidden sb-modal" style="z-index:70">
+        <form class="sb-dialog" style="max-width:420px;max-height:92vh;overflow:auto;text-align:left" onsubmit="loadRekap(event)">
+            <div class="sb-dlg-kicker" style="text-align:center">REKAPITULASI TPS</div>
+            <p class="sb-dlg-note" style="margin:8px 0 14px;text-align:center">Nomor TPS diambil otomatis dari kode perangkat tablet ini dan tidak bisa diubah. Masukkan PIN panitia untuk menampilkan rekap.</p>
+            <div id="rekap-pin-wrap"><input id="rekap-pin" type="password" inputmode="numeric" autocomplete="off" class="sb-input" placeholder="PIN panitia"></div>
+            <div id="rekap-err" class="sb-err"></div>
+            <div id="rekap-view" class="hidden"></div>
+            <div class="sb-dlg-btns" style="margin-top:10px">
+                <button type="button" class="sb-btn-sec" onclick="closeRekap()">Tutup</button>
+                <button type="submit" id="rekap-load" class="sb-btn-pri">Tampilkan</button>
+                <button type="button" id="rekap-print" class="sb-btn-pri hidden" onclick="printRekap()">Cetak</button>
+            </div>
+        </form>
     </div>
     <div id="modal-kode" class="hidden sb-modal" style="z-index:70">
         <form class="sb-dialog" onsubmit="saveKode(event)">
@@ -516,6 +531,8 @@
             switchTab('voterlogin');
             loadPublicData().then(autoLoginFromUrl);
             setInterval(() => { if (adminToken) loadPublicData(true); }, 30000);
+            // tablet bilik: segarkan pengaturan tiap 60 detik agar tombol Rekap muncul begitu panitia membukanya
+            setInterval(() => { if (!document.hidden && !adminToken && currentPage === 'voterlogin' && !voting) loadPublicData(true); }, 60000);
         });
 
         let stats = { totalDpt: 0, totalVoted: 0, votes: {} };
@@ -524,7 +541,7 @@
         const PH = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="240"><rect width="100%" height="100%" fill="#334155"/><text x="50%" y="50%" fill="#94a3b8" font-size="16" text-anchor="middle">Foto</text></svg>');
 
         /* GANTI dengan alamat Web App Apps Script Anda (Deploy > Kelola deployment > URL Aplikasi web, berakhiran /exec) */
-        const API_URL = 'https://script.google.com/macros/s/AKfycbwfNXmC14gk8Qi0T87Q_cKn_rZ6l_8UOCc6OqlxBRhUJmgq_eM7TlOWqdR1P05AilSB1A/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbxCsbzQeSnJlKKuVrUTi1_dWYMYYksa7BwiaSOCO0SfbQGe66bqur8V0_VRPEYFQ2Sb/exec';
         let perluKode = false, memKode = '';
         function getKode() { try { return localStorage.getItem('bilik_kode') || memKode; } catch (e) { return memKode; } }
         function setKode(k) { memKode = k; try { localStorage.setItem('bilik_kode', k); } catch (e) {} }
@@ -534,7 +551,8 @@
                 bootstrap: () => ({ api: 'bootstrap' }),
                 cekkode: a => ({ api: 'cekkode', kode: a[0] }),
                 loginVoterByNik: a => ({ api: 'login', nik: a[0], kode: getKode() }),
-                submitElectorateVote: a => ({ api: 'vote', token: a[0], candidateId: a[1] })
+                submitElectorateVote: a => ({ api: 'vote', token: a[0], candidateId: a[1] }),
+                rekapTps: a => ({ api: 'rekap', kode: getKode(), pin: a[0] })   // hanya kode perangkat + PIN; TPS ditentukan server
             };
             if (!/^https:\/\//.test(API_URL)) return Promise.reject(new Error('Alamat Web App belum diisi di file index.html (konstanta API_URL).'));
             return fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(map[fn](args)) })
@@ -568,6 +586,7 @@
             const btn = e.target.querySelector('button[type="submit"]'); btn.disabled = true;
             gs('cekkode', k).then(() => {
                 setKode(k);
+                updateRekapButton();
                 document.getElementById('modal-kode').classList.add('hidden');
                 if (currentPage === 'voterlogin') toggleLoginMode('scan');
             }).catch(err => { document.getElementById('kode-error').textContent = errMsg(err); })
@@ -701,7 +720,9 @@
             bold(0);
             txt(o.waktu + '\n');
             align(0); txt(LINE); align(1);
-            if (o.kode) {
+            if (o.kode && o.noQr) {
+                txt('KODE AUDIT / KODE UNIK:\n'); bold(1); txt(o.kode + '\n'); bold(0);
+            } else if (o.kode) {
                 // QR Code native ESC/POS (GS ( k)
                 const data = new TextEncoder().encode(o.qr);
                 const n = data.length + 3;
@@ -825,14 +846,187 @@
                 test, desa, tps: tpsNo, waktu, kode,
                 qr: kode ? JSON.stringify({ kode, desa, tps: tpsNo, waktu }) : ''
             };
+            // Mode_Struk: "gambar" (standar, dengan QR) atau "teks" (teks biasa tanpa QR, seperti versi awal)
+            const modeStruk = String(appSet.Mode_Struk || '').trim().toLowerCase();
+            slip.noQr = modeStruk === 'teks';
             let bytes = null;
-            try { bytes = renderSlipRaster(slip); } catch (e) { console.error('Raster struk gagal:', e); }
+            if (modeStruk !== 'teks') {
+                try { bytes = renderSlipRaster(slip); } catch (e) { console.error('Raster struk gagal:', e); }
+            }
             if (!bytes) bytes = buildSlipBytes(slip);   // cadangan: struk teks + QR bawaan printer
 
             const ok2 = sendToRawBT(bytes);
             if (!ok2) alert('Gagal mengirim struk ke RawBT. Pastikan aplikasi RawBT terpasang.');
             setTimeout(() => { if (done) done(); }, 1500);
         }
+        /* ===== REKAPITULASI PER TPS =====
+           Aturan keamanan: tablet TIDAK pernah mengirim nomor TPS. Server menentukan TPS dari kode perangkat
+           tablet ini, lalu hanya mengembalikan rekap TPS tersebut (dan hanya bila panitia sudah membukanya). */
+        let rekapData = null;
+        function rekapOn() { return ['ya', '1', 'true', 'aktif'].includes(String(appSet.Rekap_Dibuka || '').trim().toLowerCase()); }
+        function updateRekapButton() {
+            const b = document.getElementById('btn-rekap');
+            if (b) b.classList.toggle('hidden', !(perluKode && getKode() && rekapOn()));
+        }
+        function openRekap() {
+            rekapData = null;
+            stopScanner();
+            const $ = id => document.getElementById(id);
+            $('rekap-err').textContent = '';
+            $('rekap-view').innerHTML = ''; $('rekap-view').classList.add('hidden');
+            $('rekap-print').classList.add('hidden');
+            $('rekap-pin-wrap').classList.remove('hidden'); $('rekap-load').classList.remove('hidden');
+            $('rekap-pin').value = '';
+            $('modal-rekap').classList.remove('hidden');
+            setTimeout(() => { try { $('rekap-pin').focus(); } catch (e) {} }, 100);
+        }
+        function closeRekap() {
+            rekapData = null;
+            document.getElementById('rekap-view').innerHTML = '';
+            document.getElementById('rekap-pin').value = '';
+            document.getElementById('modal-rekap').classList.add('hidden');
+            if (currentPage === 'voterlogin') toggleLoginMode('scan');
+        }
+        function loadRekap(e) {
+            e.preventDefault();
+            const pin = document.getElementById('rekap-pin').value.trim();
+            const err = document.getElementById('rekap-err'); err.textContent = '';
+            const btn = document.getElementById('rekap-load'); btn.disabled = true;
+            gs('rekapTps', pin).then(d => {
+                if (!d.tps) throw new Error('Server tidak mengirim nomor TPS.');
+                const suara = (Array.isArray(d.suara) ? d.suara : []).map(x => ({
+                    noUrut: String(x.noUrut == null ? '' : x.noUrut).padStart(2, '0'),
+                    nama: String(x.nama || ''), jumlah: parseInt(x.jumlah, 10) || 0
+                }));
+                const lk = parseInt(d.lk, 10) || 0, pr = parseInt(d.pr, 10) || 0;
+                rekapData = {
+                    tps: String(d.tps).trim(), lk, pr, hadir: lk + pr,
+                    dpt: d.dpt == null ? null : (parseInt(d.dpt, 10) || 0),
+                    suara, sah: suara.reduce((a, x) => a + x.jumlah, 0)
+                };
+                renderRekapView();
+            }).catch(ex => { err.textContent = errMsg(ex); })
+              .finally(() => { btn.disabled = false; });
+        }
+        function renderRekapView() {
+            const r = rekapData, v = document.getElementById('rekap-view');
+            const row = (a, b, bold) => `<tr style="${bold ? 'font-weight:800;border-top:1px solid #cbd5e1' : ''}"><td style="padding:3px 0">${a}</td><td style="text-align:right;padding:3px 0">${b}</td></tr>`;
+            const warn = r.sah !== r.hadir
+                ? `<div class="sb-err" style="margin-top:8px">Perhatian: jumlah suara (${r.sah}) tidak sama dengan pemilih hadir (${r.hadir}). Periksa data sebelum ditandatangani.</div>` : '';
+            v.innerHTML = `<div style="text-align:center;font-weight:800;font-size:22px;margin:6px 0 10px">TPS ${esc(r.tps)}</div>
+                <table style="width:100%;font-size:14px">${row('Hadir - Laki-laki', r.lk)}${row('Hadir - Perempuan', r.pr)}${row('Jumlah hadir', r.hadir, true)}${r.dpt != null ? row('DPT TPS ini', r.dpt) : ''}</table>
+                <div style="font-weight:800;font-size:12px;letter-spacing:.1em;color:#64748b;margin:14px 0 4px">PEROLEHAN SUARA</div>
+                <table style="width:100%;font-size:14px">${r.suara.map(x => row(esc(x.noUrut + '. ' + x.nama), x.jumlah)).join('')}${row('Jumlah suara', r.sah, true)}</table>${warn}`;
+            v.classList.remove('hidden');
+            document.getElementById('rekap-pin-wrap').classList.add('hidden');
+            document.getElementById('rekap-load').classList.add('hidden');
+            document.getElementById('rekap-print').classList.remove('hidden');
+        }
+        function rekapTime() {
+            return new Date().toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
+        }
+        function buildRekapText(r) {
+            const out = [], COLS = 32, LINE = '-'.repeat(COLS) + '\n';
+            const raw = (...b) => { for (const x of b) out.push(x); };
+            const txt = t => { new TextEncoder().encode(toAscii(t)).forEach(x => out.push(x)); };
+            const align = n => raw(0x1B, 0x61, n), bold = n => raw(0x1B, 0x45, n);
+            const rowLR = (l, v) => { v = String(v); l = toAscii(l).slice(0, COLS - v.length - 1); txt(l + ' '.repeat(COLS - l.length - v.length) + v + '\n'); };
+            raw(0x1B, 0x40);
+            align(1); bold(1); txt('REKAPITULASI SUARA\nPILKADES DESA ' + r.desa + '\nTPS : ' + r.tps + '\n'); bold(0);
+            txt(r.waktuCetak + '\n'); align(0); txt(LINE);
+            bold(1); txt('PEMILIH HADIR\n'); bold(0);
+            rowLR('Laki-laki', r.lk); rowLR('Perempuan', r.pr); bold(1); rowLR('Jumlah', r.hadir); bold(0);
+            if (r.dpt != null) rowLR('DPT TPS ini', r.dpt);
+            txt(LINE); bold(1); txt('PEROLEHAN SUARA\n'); bold(0);
+            r.suara.forEach(x => rowLR(x.noUrut + '. ' + x.nama, x.jumlah));
+            bold(1); rowLR('Jumlah suara', r.sah); bold(0);
+            if (r.sah !== r.hadir) txt('*SELISIH DGN PEMILIH HADIR*\n');
+            txt(LINE); align(1);
+            txt('Ketua KPPS TPS ' + r.tps + ',\n\n\n\n(......................)\n');
+            align(0); txt('\n\n');
+            raw(0x1B, 0x64, 4, 0x1D, 0x56, 0x01);
+            return new Uint8Array(out);
+        }
+        function renderRekapRaster(r) {
+            const W = (parseInt(appSet.Lebar_Struk_Dot, 10) || 384) & ~7;
+            const cv = document.createElement('canvas');
+            cv.width = W; cv.height = 560 + 30 * r.suara.length;
+            const ctx = cv.getContext('2d', { willReadFrequently: true });
+            ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, cv.height);
+            ctx.fillStyle = '#000'; ctx.textBaseline = 'top';
+            const SANS = 'Arial, Helvetica, sans-serif';
+            let y = 8;
+            const center = (t, px, weight, gap) => {
+                t = toAscii(t); let f = px;
+                ctx.textAlign = 'center';
+                do { ctx.font = `${weight} ${f}px ${SANS}`; f--; } while (ctx.measureText(t).width > W - 16 && f > 10);
+                ctx.fillText(t, W / 2, y); y += px + (gap == null ? 6 : gap);
+            };
+            const left = (t, weight) => { ctx.textAlign = 'left'; ctx.font = `${weight || 'bold'} 18px ${SANS}`; ctx.fillText(toAscii(t), 8, y); y += 26; };
+            const dash = () => {
+                ctx.save(); ctx.setLineDash([6, 4]); ctx.lineWidth = 2;
+                ctx.beginPath(); ctx.moveTo(4, y + 3); ctx.lineTo(W - 4, y + 3); ctx.stroke(); ctx.restore(); y += 14;
+            };
+            const rowLR = (l, v, weight) => {
+                v = String(v); ctx.font = `${weight || 'normal'} 20px ${SANS}`;
+                const vw = ctx.measureText(v).width; let lab = toAscii(l);
+                while (lab.length > 1 && ctx.measureText(lab).width > W - 16 - vw - 10) lab = lab.slice(0, -1);
+                ctx.textAlign = 'left'; ctx.fillText(lab, 8, y);
+                ctx.textAlign = 'right'; ctx.fillText(v, W - 8, y); y += 27;
+            };
+            center('REKAPITULASI SUARA', 28, 'bold', 6);
+            center('PILKADES DESA ' + r.desa, 21, 'normal', 6);
+            center('TPS: ' + r.tps, 28, 'bold', 4);
+            center(r.waktuCetak, 18, 'normal', 4);
+            dash();
+            left('PEMILIH HADIR');
+            rowLR('Laki-laki', r.lk); rowLR('Perempuan', r.pr); rowLR('Jumlah', r.hadir, 'bold');
+            if (r.dpt != null) rowLR('DPT TPS ini', r.dpt);
+            dash();
+            left('PEROLEHAN SUARA');
+            r.suara.forEach(x => rowLR(x.noUrut + '. ' + x.nama, x.jumlah));
+            rowLR('Jumlah suara', r.sah, 'bold');
+            if (r.sah !== r.hadir) center('*SELISIH DENGAN PEMILIH HADIR*', 16, 'bold', 4);
+            dash();
+            center('Ketua KPPS TPS ' + r.tps + ',', 20, 'normal', 70);
+            center('(......................)', 20, 'normal', 8);
+            const H = Math.ceil((y + 6) / 8) * 8;
+            return packRaster(ctx.getImageData(0, 0, W, H).data, W, H);
+        }
+        function printRekapBrowser(r) {
+            const row = (a, b, bold) => `<tr style="${bold ? 'font-weight:bold;border-top:1px solid #000' : ''}"><td>${a}</td><td style="text-align:right">${b}</td></tr>`;
+            document.getElementById('print-area').innerHTML = `
+                <div style="width:48mm;margin:0 auto;font-family:Arial,sans-serif;color:#000;font-size:10px;padding:2mm 0">
+                    <div style="text-align:center;font-weight:bold;font-size:13px">REKAPITULASI SUARA</div>
+                    <div style="text-align:center;font-size:11px">PILKADES DESA ${esc(r.desa)}</div>
+                    <div style="text-align:center;font-weight:bold;font-size:12px">TPS: ${esc(r.tps)}</div>
+                    <div style="text-align:center;font-size:9px">${esc(r.waktuCetak)}</div>
+                    <div style="border-top:1px dashed #000;margin:2mm 0"></div>
+                    <b>PEMILIH HADIR</b>
+                    <table style="width:100%;font-size:10px">${row('Laki-laki', r.lk)}${row('Perempuan', r.pr)}${row('Jumlah', r.hadir, true)}${r.dpt != null ? row('DPT TPS ini', r.dpt) : ''}</table>
+                    <div style="border-top:1px dashed #000;margin:2mm 0"></div>
+                    <b>PEROLEHAN SUARA</b>
+                    <table style="width:100%;font-size:10px">${r.suara.map(x => row(esc(x.noUrut + '. ' + x.nama), x.jumlah)).join('')}${row('Jumlah suara', r.sah, true)}</table>
+                    ${r.sah !== r.hadir ? '<div style="font-weight:bold;text-align:center">*SELISIH DENGAN PEMILIH HADIR*</div>' : ''}
+                    <div style="border-top:1px dashed #000;margin:2mm 0"></div>
+                    <div style="text-align:center">Ketua KPPS TPS ${esc(r.tps)},<br><br><br><br>(......................)</div>
+                </div>`;
+            setPage('@page { size: 58mm auto; margin: 0; }');
+            setTimeout(() => window.print(), 300);
+        }
+        function printRekap() {
+            if (!rekapData) return;
+            const r = Object.assign({}, rekapData, {
+                desa: (appSet.Nama_Desa || 'Salamjaya').toUpperCase(), waktuCetak: rekapTime()
+            });
+            if (!useRawBT()) return printRekapBrowser(r);
+            const modeStruk = String(appSet.Mode_Struk || '').trim().toLowerCase();
+            let bytes = null;
+            if (modeStruk !== 'teks') { try { bytes = renderRekapRaster(r); } catch (e) { console.error('Raster rekap gagal:', e); } }
+            if (!bytes) bytes = buildRekapText(r);
+            if (!sendToRawBT(bytes)) alert('Gagal mengirim rekap ke RawBT. Pastikan aplikasi RawBT terpasang.');
+        }
+
         let currentPage = 'voterlogin';
         function fsOn() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
         function fsSupported() { return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled); }
@@ -878,6 +1072,7 @@
                 }));
                 perluKode = !!d.perluKode;
                 document.getElementById('btn-kode').classList.toggle('hidden', !perluKode);
+                updateRekapButton();
                 renderAllWidgetsAndGrids();
                 if (perluKode && !getKode()) showKodeModal();
             }).catch(e => { if (!quiet) alert('Gagal memuat data: ' + errMsg(e)); });
