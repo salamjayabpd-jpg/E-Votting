@@ -484,6 +484,9 @@
             <input id="input-kode" type="text" autocomplete="off" autocapitalize="off" class="sb-input" placeholder="Kode perangkat">
             <div id="kode-error" class="sb-err"></div>
             <div class="sb-dlg-btns" style="margin-top:10px"><button type="submit" class="sb-btn-pri">Aktifkan</button></div>
+            <div id="kode-rekap-wrap" class="hidden" style="border-top:1px dashed #cbd5e1;margin-top:16px;padding-top:14px">
+                <div class="sb-dlg-btns"><button type="button" id="btn-rekap-modal" class="sb-btn-pri" onclick="bukaRekapDariKode()">Cetak Rekap TPS</button></div>
+            </div>
         </form>
     </div>
 
@@ -541,7 +544,7 @@
         const PH = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="240"><rect width="100%" height="100%" fill="#334155"/><text x="50%" y="50%" fill="#94a3b8" font-size="16" text-anchor="middle">Foto</text></svg>');
 
         /* GANTI dengan alamat Web App Apps Script Anda (Deploy > Kelola deployment > URL Aplikasi web, berakhiran /exec) */
-        const API_URL = 'https://script.google.com/macros/s/AKfycbxCsbzQeSnJlKKuVrUTi1_dWYMYYksa7BwiaSOCO0SfbQGe66bqur8V0_VRPEYFQ2Sb/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbzC78EutO16od83C5_Y1En0TWZZqZCmQiv2GkLQ7ewWOoGVjE1r8pBdw9LSB34pklEkDw/exec';
         let perluKode = false, memKode = '';
         function getKode() { try { return localStorage.getItem('bilik_kode') || memKode; } catch (e) { return memKode; } }
         function setKode(k) { memKode = k; try { localStorage.setItem('bilik_kode', k); } catch (e) {} }
@@ -576,6 +579,7 @@
             document.getElementById('kode-error').textContent = msg || '';
             document.getElementById('input-kode').value = '';
             document.getElementById('modal-kode').classList.remove('hidden');
+            updateRekapButton();
             stopScanner();
             setTimeout(() => { try { document.getElementById('input-kode').focus(); } catch (e) {} }, 100);
         }
@@ -866,7 +870,14 @@
         function rekapOn() { return ['ya', '1', 'true', 'aktif'].includes(String(appSet.Rekap_Dibuka || '').trim().toLowerCase()); }
         function updateRekapButton() {
             const b = document.getElementById('btn-rekap');
-            if (b) b.classList.toggle('hidden', !(perluKode && getKode() && rekapOn()));
+            const tampil = !!(perluKode && getKode() && rekapOn());
+            if (b) b.classList.toggle('hidden', !tampil);
+            const w = document.getElementById('kode-rekap-wrap');
+            if (w) w.classList.toggle('hidden', !tampil);
+        }
+        function bukaRekapDariKode() {
+            document.getElementById('modal-kode').classList.add('hidden');
+            openRekap();
         }
         function openRekap() {
             rekapData = null;
@@ -902,8 +913,13 @@
                 rekapData = {
                     tps: String(d.tps).trim(), lk, pr, hadir: lk + pr,
                     dpt: d.dpt == null ? null : (parseInt(d.dpt, 10) || 0),
+                    dl: d.dptL == null ? null : (parseInt(d.dptL, 10) || 0),
+                    dp: d.dptP == null ? null : (parseInt(d.dptP, 10) || 0),
+                    tl: d.dptL == null ? null : Math.max(0, (parseInt(d.dptL, 10) || 0) - lk),   // tidak hadir L = DPT L - hadir L
+                    tp: d.dptP == null ? null : Math.max(0, (parseInt(d.dptP, 10) || 0) - pr),   // tidak hadir P = DPT P - hadir P
                     suara, sah: suara.reduce((a, x) => a + x.jumlah, 0)
                 };
+                rekapData.tsah = Math.max(0, rekapData.hadir - rekapData.sah);   // suara tidak sah = hadir - suara sah (e-voting tidak mencatat surat suara rusak, umumnya 0)
                 renderRekapView();
             }).catch(ex => { err.textContent = errMsg(ex); })
               .finally(() => { btn.disabled = false; });
@@ -914,9 +930,9 @@
             const warn = r.sah !== r.hadir
                 ? `<div class="sb-err" style="margin-top:8px">Perhatian: jumlah suara (${r.sah}) tidak sama dengan pemilih hadir (${r.hadir}). Periksa data sebelum ditandatangani.</div>` : '';
             v.innerHTML = `<div style="text-align:center;font-weight:800;font-size:22px;margin:6px 0 10px">TPS ${esc(r.tps)}</div>
-                <table style="width:100%;font-size:14px">${row('Hadir - Laki-laki', r.lk)}${row('Hadir - Perempuan', r.pr)}${row('Jumlah hadir', r.hadir, true)}${r.dpt != null ? row('DPT TPS ini', r.dpt) : ''}</table>
-                <div style="font-weight:800;font-size:12px;letter-spacing:.1em;color:#64748b;margin:14px 0 4px">PEROLEHAN SUARA</div>
-                <table style="width:100%;font-size:14px">${r.suara.map(x => row(esc(x.noUrut + '. ' + x.nama), x.jumlah)).join('')}${row('Jumlah suara', r.sah, true)}</table>${warn}`;
+                <table style="width:100%;font-size:14px">${r.dl != null && r.dp != null ? row('DPT - Laki-laki', r.dl) + row('DPT - Perempuan', r.dp) : ''}${r.dpt != null ? row('Jumlah DPT TPS ini', r.dpt, true) : ''}${row('Hadir - Laki-laki', r.lk)}${row('Hadir - Perempuan', r.pr)}${row('Jumlah hadir', r.hadir, true)}${r.tl != null && r.tp != null ? row('Tidak hadir - Laki-laki', r.tl) + row('Tidak hadir - Perempuan', r.tp) + row('Jumlah tidak hadir', r.tl + r.tp, true) : ''}</table>
+                <div style="font-weight:800;font-size:12px;letter-spacing:.1em;color:#64748b;margin:14px 0 4px">PEROLEHAN SUARA CAKADES</div>
+                <table style="width:100%;font-size:14px">${r.suara.map(x => row(esc(x.noUrut + '. ' + x.nama), x.jumlah)).join('')}${row('JUMLAH SUARA SAH', r.sah, true)}${row('JUMLAH SUARA TIDAK SAH', r.tsah, true)}</table>${warn}`;
             v.classList.remove('hidden');
             document.getElementById('rekap-pin-wrap').classList.add('hidden');
             document.getElementById('rekap-load').classList.add('hidden');
@@ -934,12 +950,13 @@
             raw(0x1B, 0x40);
             align(1); bold(1); txt('REKAPITULASI SUARA\nPILKADES DESA ' + r.desa + '\nTPS : ' + r.tps + '\n'); bold(0);
             txt(r.waktuCetak + '\n'); align(0); txt(LINE);
+            if (r.dpt != null) { bold(1); txt('DPT TPS INI\n'); bold(0); if (r.dl != null && r.dp != null) { rowLR('Laki-laki', r.dl); rowLR('Perempuan', r.dp); } bold(1); rowLR('Jumlah DPT', r.dpt); bold(0); }
             bold(1); txt('PEMILIH HADIR\n'); bold(0);
             rowLR('Laki-laki', r.lk); rowLR('Perempuan', r.pr); bold(1); rowLR('Jumlah', r.hadir); bold(0);
-            if (r.dpt != null) rowLR('DPT TPS ini', r.dpt);
-            txt(LINE); bold(1); txt('PEROLEHAN SUARA\n'); bold(0);
+            if (r.tl != null && r.tp != null) { bold(1); txt('PEMILIH TIDAK HADIR\n'); bold(0); rowLR('Laki-laki', r.tl); rowLR('Perempuan', r.tp); bold(1); rowLR('Jumlah', r.tl + r.tp); bold(0); }
+            txt(LINE); bold(1); txt('PEROLEHAN SUARA CAKADES\n'); bold(0);
             r.suara.forEach(x => rowLR(x.noUrut + '. ' + x.nama, x.jumlah));
-            bold(1); rowLR('Jumlah suara', r.sah); bold(0);
+            bold(1); rowLR('JUMLAH SUARA SAH', r.sah); rowLR('JUMLAH SUARA TIDAK SAH', r.tsah); bold(0);
             if (r.sah !== r.hadir) txt('*SELISIH DGN PEMILIH HADIR*\n');
             txt(LINE); align(1);
             txt('Ketua KPPS TPS ' + r.tps + ',\n\n\n\n(......................)\n');
@@ -950,7 +967,7 @@
         function renderRekapRaster(r) {
             const W = (parseInt(appSet.Lebar_Struk_Dot, 10) || 384) & ~7;
             const cv = document.createElement('canvas');
-            cv.width = W; cv.height = 560 + 30 * r.suara.length;
+            cv.width = W; cv.height = 820 + 30 * r.suara.length;
             const ctx = cv.getContext('2d', { willReadFrequently: true });
             ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, cv.height);
             ctx.fillStyle = '#000'; ctx.textBaseline = 'top';
@@ -979,13 +996,15 @@
             center('TPS: ' + r.tps, 28, 'bold', 4);
             center(r.waktuCetak, 18, 'normal', 4);
             dash();
+            if (r.dpt != null) { left('DPT TPS INI'); if (r.dl != null && r.dp != null) { rowLR('Laki-laki', r.dl); rowLR('Perempuan', r.dp); } rowLR('Jumlah DPT', r.dpt, 'bold'); }
             left('PEMILIH HADIR');
             rowLR('Laki-laki', r.lk); rowLR('Perempuan', r.pr); rowLR('Jumlah', r.hadir, 'bold');
-            if (r.dpt != null) rowLR('DPT TPS ini', r.dpt);
+            if (r.tl != null && r.tp != null) { left('PEMILIH TIDAK HADIR'); rowLR('Laki-laki', r.tl); rowLR('Perempuan', r.tp); rowLR('Jumlah', r.tl + r.tp, 'bold'); }
             dash();
-            left('PEROLEHAN SUARA');
+            left('PEROLEHAN SUARA CAKADES');
             r.suara.forEach(x => rowLR(x.noUrut + '. ' + x.nama, x.jumlah));
-            rowLR('Jumlah suara', r.sah, 'bold');
+            rowLR('JUMLAH SUARA SAH', r.sah, 'bold');
+            rowLR('JUMLAH SUARA TIDAK SAH', r.tsah, 'bold');
             if (r.sah !== r.hadir) center('*SELISIH DENGAN PEMILIH HADIR*', 16, 'bold', 4);
             dash();
             center('Ketua KPPS TPS ' + r.tps + ',', 20, 'normal', 70);
@@ -1002,11 +1021,13 @@
                     <div style="text-align:center;font-weight:bold;font-size:12px">TPS: ${esc(r.tps)}</div>
                     <div style="text-align:center;font-size:9px">${esc(r.waktuCetak)}</div>
                     <div style="border-top:1px dashed #000;margin:2mm 0"></div>
+                    ${r.dpt != null ? `<b>DPT TPS INI</b><table style="width:100%;font-size:10px">${r.dl != null && r.dp != null ? row('Laki-laki', r.dl) + row('Perempuan', r.dp) : ''}${row('Jumlah DPT', r.dpt, true)}</table>` : ''}
                     <b>PEMILIH HADIR</b>
-                    <table style="width:100%;font-size:10px">${row('Laki-laki', r.lk)}${row('Perempuan', r.pr)}${row('Jumlah', r.hadir, true)}${r.dpt != null ? row('DPT TPS ini', r.dpt) : ''}</table>
+                    <table style="width:100%;font-size:10px">${row('Laki-laki', r.lk)}${row('Perempuan', r.pr)}${row('Jumlah', r.hadir, true)}</table>
+                    ${r.tl != null && r.tp != null ? `<b>PEMILIH TIDAK HADIR</b><table style="width:100%;font-size:10px">${row('Laki-laki', r.tl)}${row('Perempuan', r.tp)}${row('Jumlah', r.tl + r.tp, true)}</table>` : ''}
                     <div style="border-top:1px dashed #000;margin:2mm 0"></div>
-                    <b>PEROLEHAN SUARA</b>
-                    <table style="width:100%;font-size:10px">${r.suara.map(x => row(esc(x.noUrut + '. ' + x.nama), x.jumlah)).join('')}${row('Jumlah suara', r.sah, true)}</table>
+                    <b>PEROLEHAN SUARA CAKADES</b>
+                    <table style="width:100%;font-size:10px">${r.suara.map(x => row(esc(x.noUrut + '. ' + x.nama), x.jumlah)).join('')}${row('JUMLAH SUARA SAH', r.sah, true)}${row('JUMLAH SUARA TIDAK SAH', r.tsah, true)}</table>
                     ${r.sah !== r.hadir ? '<div style="font-weight:bold;text-align:center">*SELISIH DENGAN PEMILIH HADIR*</div>' : ''}
                     <div style="border-top:1px dashed #000;margin:2mm 0"></div>
                     <div style="text-align:center">Ketua KPPS TPS ${esc(r.tps)},<br><br><br><br>(......................)</div>
