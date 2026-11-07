@@ -307,8 +307,47 @@
     <meta name="theme-color" content="#0f172a">
     <meta name="mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-capable" content="yes">
+<style id="kiosk-ui">
+/* ===== TABLET TPS: tampilan pemilih ===== */
+body.kiosk-voter > header, body.kiosk-voter > footer { display: none !important; }
+body.kiosk-voter #page-voterlogin { min-height: 100vh !important; min-height: 100dvh !important; }
+body.kiosk-voter #page-voterlogin > div { max-width: min(680px, 94vw) !important; }
+/* kotak kamera: video memenuhi seluruh kotak */
+.scan-box { position: relative; width: 100%; height: min(52vh, 460px); min-height: 240px; background: #000; border-radius: 16px; overflow: hidden; border: 2px dashed #334155; }
+.scan-box #reader { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; border: 0 !important; padding: 0 !important; }
+.scan-box #reader > div { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; min-height: 0 !important; padding: 0 !important; border: 0 !important; }
+.scan-box #reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; display: block !important; }
+/* menu panitia (roda gigi) */
+#kiosk-gear { opacity: .4; }
+#kiosk-gear:active { opacity: 1; }
+#kiosk-menu .kiosk-item { color: #cbd5e1; font-size: 14px; padding: 10px 14px; text-align: left; }
+#kiosk-menu .kiosk-item button { color: #cbd5e1; font-size: 14px; padding: 10px 14px; text-align: left; width: 100%; }
+/* surat suara: pilih dulu (bingkai merah), lalu tekan "Pilih Kandidat Ini" */
+.sb-card.sel { border-color: #dc2626 !important; box-shadow: 0 0 0 calc(var(--cw)*.025) rgba(220,38,38,.55) !important; transform: scale(1.03) !important; }
+.sb-grid.has-sel .sb-card:not(.sel) { opacity: .25 !important; }
+button.sb-pill { border: 0; width: min(92vw, 720px); font-family: inherit; cursor: pointer; background: #2563eb; box-shadow: 0 8px 22px rgba(37,99,235,.4); }
+button.sb-pill.off { background: #94a3b8; box-shadow: none; cursor: default; }
+/* halaman konfirmasi: foto sama dengan ukuran di surat suara, tombol selalu terlihat */
+#modal-confirm-vote .cf2 { width: min(94vw, 560px); max-width: none; max-height: 96vh; max-height: 96dvh; overflow: auto; box-sizing: border-box; padding: 18px 22px; border-radius: 28px; background: #fff !important; color: #0f172a; box-shadow: 0 25px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+#modal-confirm-vote .cf2-card { --cfw: 200px; width: var(--cfw); box-sizing: border-box; flex: 0 0 auto; padding: calc(var(--cfw)*.05); border: calc(var(--cfw)*.014 + 1px) solid #231f20; border-radius: 12px; background: #fff; }
+#modal-confirm-vote .cf2-no { font-size: calc(var(--cfw)*.16); font-weight: 800; color: #231f20; line-height: 1.1; }
+#modal-confirm-vote .cf2-photo { width: 100%; aspect-ratio: 3/4; border: 1px solid #231f20; background: #e5e7eb; overflow: hidden; }
+#modal-confirm-vote .cf2-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#modal-confirm-vote .cf2-name { font-size: max(12px, calc(var(--cfw)*.075)); font-weight: 800; text-transform: uppercase; color: #231f20; line-height: 1.2; min-height: calc(var(--cfw)*.18); margin-top: calc(var(--cfw)*.03); display: flex; align-items: center; justify-content: center; }
+#modal-confirm-vote .cf2-side { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+#modal-confirm-vote .cf2-title { margin: 0; font-size: clamp(22px, 4vh, 32px); font-weight: 900; color: #000; line-height: 1.15; }
+#modal-confirm-vote .cf2-q { margin: 0; font-size: clamp(16px, 2.8vh, 22px); font-weight: 800; color: #dc2626; line-height: 1.3; }
+#modal-confirm-vote .cf2-btns { display: flex; gap: 12px; width: 100%; margin-top: 4px; }
+#modal-confirm-vote .cf2-btn { flex: 1; min-height: 58px; border: 0; border-radius: 16px; color: #fff; font-weight: 900; font-size: clamp(17px, 3vh, 22px); cursor: pointer; }
+#modal-confirm-vote .cf2-ulang { background: #dc2626; box-shadow: 0 8px 20px rgba(220,38,38,.3); }
+#modal-confirm-vote .cf2-pilih { background: #2563eb; flex: 1.4; box-shadow: 0 8px 20px rgba(37,99,235,.35); }
+@media (orientation: landscape) {
+  #modal-confirm-vote .cf2 { width: min(94vw, 900px); flex-direction: row; align-items: center; gap: 28px; padding: 18px 26px; }
+  #modal-confirm-vote .cf2-side { flex: 1; min-width: 0; }
+}
+</style>
 </head>
-<body class="h-full bg-slate-900 text-slate-100 antialiased flex flex-col justify-between selection:bg-blue-500 selection:text-white">
+<body class="kiosk-voter h-full bg-slate-900 text-slate-100 antialiased flex flex-col justify-between selection:bg-blue-500 selection:text-white">
 
     <header class="sticky top-0 z-40 w-full glass-panel border-b border-slate-800/80">
         <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
@@ -355,9 +394,7 @@
 
             <!-- MODE 1: SCANNER -->
             <div id="login-mode-scan" class="space-y-4">
-                <div class="bg-black rounded-2xl overflow-hidden border-2 border-dashed border-slate-700 relative min-h-[220px] flex items-center justify-center">
-                    <div id="reader" class="w-full h-full"></div>
-                </div>
+                <div class="scan-box"><div id="reader"></div></div>
                 <p class="text-[11px] text-center text-slate-400">Arahkan kamera ke QR/Barcode pada Kartu Pemilih.</p>
                 <label class="block w-full py-2.5 text-center text-xs font-bold text-slate-200 bg-slate-800 hover:bg-slate-700 border border-slate-700 rounded-xl cursor-pointer">
                     <i class="fa-solid fa-image mr-1"></i> Ambil Foto QR/Barcode (kamera bawaan HP)
@@ -415,7 +452,7 @@
         
             <!-- Footer -->
             <div class="sb-foot">
-                <div id="sb-hint" class="sb-pill">Ketuk Foto Calon Pilihan Anda</div>
+                <button type="button" id="sb-hint" class="sb-pill off" disabled onclick="bukaKonfirmasi()">Ketuk Foto Calon Pilihan Anda</button>
             </div>
         </section>
 
@@ -426,6 +463,7 @@
             <p>© By. R@yanet 2026 Panitia Pemilihan Kepala Desa Digital Salamjaya. Hak Cipta Dilindungi.</p>
             <button type="button" id="btn-kode" onclick="showKodeModal()" class="hidden underline text-slate-400">Kode perangkat</button>
             <button type="button" id="btn-rekap" onclick="openRekap()" class="hidden underline text-slate-400">Rekapitulasi TPS</button>
+            <button type="button" id="btn-audit" onclick="openAudit()" class="hidden underline text-slate-400">Audit Struk</button>
             <p class="flex items-center gap-2">
                 <span class="w-2 h-2 rounded-full bg-emerald-500"></span> System Operational & Encrypted
             </p>
@@ -438,30 +476,41 @@
 
     <!-- 3. CONFIRM VOTE MODAL -->
     <div id="modal-confirm-vote" class="hidden sb-modal sb-cf-back">
-        <div class="sb-cf" style="max-width: 440px; background: #ffffff !important; border-radius: 28px; padding: 28px 24px; text-align: center; color: #0f172a; box-shadow: 0 25px 60px rgba(0,0,0,0.35);">
-            <div class="sb-cf-ico"><i class="fa-solid fa-check-double"></i></div>
-            <h2 class="sb-cf-title" style="font-size: 24px; font-weight: 800; color: #0f172a; margin-bottom: 6px;">Konfirmasi Coblos Suara</h2>
-            <p class="sb-cf-text" style="font-size: 13px; color: #64748b; margin-bottom: 20px;">Apakah Anda yakin hendak memilih calon berikut? Pilihan tidak dapat diubah setelah dikonfirmasi.</p>
-            
-            <!-- Tampilan Kartu Kandidat: Nomor di Atas, Foto di Tengah, Nama di Bawah -->
-            <div style="background: #ffffff; border: 3px solid #231f20; border-radius: 16px; padding: 16px; margin-bottom: 24px; display: inline-block; width: 220px; box-shadow: 0 8px 20px rgba(0,0,0,0.08);">
-                <!-- Angka Nomor Urut Besar di Atas Foto -->
-                <div id="cf-no" style="font-size: 36px; font-weight: 800; color: #231f20; margin-bottom: 8px; line-height: 1;">1</div>
-                
-                <!-- Foto Kandidat -->
-                <div style="width: 100%; aspect-ratio: 3/4; border: 1px solid #231f20; background: #e5e7eb; overflow: hidden; border-radius: 4px; margin-bottom: 12px;">
-                    <img id="cf-img" alt="" onerror="this.onerror=null;this.src=PH" style="width: 100%; height: 100%; object-fit: cover; display: block;">
-                </div>
-                
-                <!-- Nama Kandidat di Bawah Foto -->
-                <div id="cf-name" style="font-size: 15px; font-weight: 800; text-transform: uppercase; color: #231f20; line-height: 1.2; min-height: 36px; display: flex; align-items: center; justify-content: center;">-</div>
+        <div class="cf2">
+            <div class="cf2-card" id="cf-card">
+                <div class="cf2-no" id="cf-no">1</div>
+                <div class="cf2-photo"><img id="cf-img" alt="" onerror="this.onerror=null;this.src=PH"></div>
+                <div class="cf2-name" id="cf-name">-</div>
             </div>
-    
-            <div class="sb-cf-btns" style="display: flex; gap: 12px;">
-                <button type="button" class="sb-cf-cancel" style="flex: 1; padding: 14px; border-radius: 14px; border: 0; background: #dc2626; color: #fff; font-weight: 800; font-size: 15px;" onclick="closeConfirmVoteModal()">Batal</button>
-                <button type="button" class="sb-cf-ok" style="flex: 1.6; padding: 14px; border-radius: 14px; border: 0; background: #059669; color: #fff; font-weight: 800; font-size: 15px;" onclick="submitVote()"><i class="fa-solid fa-check"></i> <span id="confirm-btn-label">Simpan &amp; Cetak Hasil</span></button>
+            <div class="cf2-side">
+                <h2 class="cf2-title">Konfirmasi Pemilihan</h2>
+                <p class="cf2-q">Apakah Anda yakin akan memilih kandidat ini?</p>
+                <div class="cf2-btns">
+                    <button type="button" class="cf2-btn cf2-ulang" onclick="closeConfirmVoteModal()">Ulangi</button>
+                    <button type="button" class="cf2-btn cf2-pilih" onclick="submitVote()"><span id="confirm-btn-label">Pilih</span></button>
+                </div>
             </div>
         </div>
+    </div>
+        <div id="modal-audit" class="hidden sb-modal" style="z-index:70">
+        <form class="sb-dialog" style="max-width:460px;max-height:94vh;overflow:auto;text-align:left" onsubmit="auditMulai(event)">
+            <div style="text-align:center;font-weight:800;font-size:18px">AUDIT STRUK TPS</div>
+            <p style="font-size:12px;color:#64748b;text-align:center;margin:4px 0 10px">Pindai QR semua struk di kotak audit, lalu cocokkan dengan Log_Struk. Hanya setelah pemungutan suara ditutup.</p>
+            <div id="audit-pin-wrap"><input id="audit-pin" type="password" inputmode="numeric" autocomplete="off" class="sb-input" placeholder="PIN panitia"></div>
+            <div id="audit-err" class="sb-err" style="text-align:center"></div>
+            <div id="audit-main" class="hidden">
+                <div id="audit-info" style="font-size:12px;color:#334155;margin-bottom:6px"></div>
+                <div id="audit-reader" style="width:100%;border-radius:12px;overflow:hidden;background:#0f172a;min-height:200px"></div>
+                <div id="audit-last" style="font-size:13px;font-weight:700;min-height:20px;margin-top:6px"></div>
+                <div id="audit-count" style="font-size:13px;margin-top:2px"></div>
+                <div id="audit-result" style="margin-top:10px;font-size:13px"></div>
+            </div>
+            <div class="sb-dlg-btns" style="margin-top:12px">
+                <button type="button" class="sb-btn-sec" onclick="closeAudit()">Tutup</button>
+                <button type="submit" id="audit-start" class="sb-btn-pri">Mulai</button>
+                <button type="button" id="audit-match" class="sb-btn-pri hidden" onclick="auditCocokkan()">Cocokkan dengan Log</button>
+            </div>
+        </form>
     </div>
     <div id="modal-rekap" class="hidden sb-modal" style="z-index:70">
         <form class="sb-dialog" style="max-width:420px;max-height:92vh;overflow:auto;text-align:left" onsubmit="loadRekap(event)">
@@ -485,7 +534,7 @@
             <div id="kode-error" class="sb-err"></div>
             <div class="sb-dlg-btns" style="margin-top:10px"><button type="submit" class="sb-btn-pri">Aktifkan</button></div>
             <div id="kode-rekap-wrap" class="hidden" style="border-top:1px dashed #cbd5e1;margin-top:16px;padding-top:14px">
-                <div class="sb-dlg-btns"><button type="button" id="btn-rekap-modal" class="sb-btn-pri" onclick="bukaRekapDariKode()">Cetak Rekap TPS</button></div>
+                <div class="sb-dlg-btns"><button type="button" id="btn-rekap-modal" class="sb-btn-pri" onclick="bukaRekapDariKode()">Cetak Rekap TPS</button><button type="button" class="sb-btn-sec" onclick="document.getElementById('modal-kode').classList.add('hidden');openAudit()">Audit Struk</button></div>
             </div>
         </form>
     </div>
@@ -499,6 +548,8 @@
     <!-- 6. ADD / EDIT CANDIDATE MODAL -->
     
 
+    <button id="kiosk-gear" type="button" onclick="toggleKioskMenu()" title="Menu panitia" class="hidden fixed bottom-4 left-4 z-40 w-11 h-11 rounded-full bg-slate-800/90 border border-slate-600 text-slate-200 flex items-center justify-center shadow-lg"><i class="fa-solid fa-gear"></i></button>
+    <div id="kiosk-menu" class="hidden fixed bottom-20 left-4 z-50 flex flex-col gap-1 p-2 rounded-2xl bg-slate-800 border border-slate-600 shadow-2xl"><div id="kiosk-empty" class="hidden text-xs text-slate-400 px-3 py-2">Tidak ada menu</div></div>
     <button id="btn-fs" onclick="goFullscreen()" title="Layar penuh" class="hidden fixed bottom-4 right-4 z-40 w-11 h-11 rounded-full bg-slate-800/90 border border-slate-600 text-slate-200 hover:bg-slate-700 flex items-center justify-center shadow-lg"><i class="fa-solid fa-expand"></i></button>
     <div id="modal-thanks" class="fixed inset-0 z-[60] hidden bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="glass-panel max-w-md w-full p-8 rounded-3xl text-center space-y-3 border border-slate-700">
@@ -544,7 +595,7 @@
         const PH = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="240"><rect width="100%" height="100%" fill="#334155"/><text x="50%" y="50%" fill="#94a3b8" font-size="16" text-anchor="middle">Foto</text></svg>');
 
         /* GANTI dengan alamat Web App Apps Script Anda (Deploy > Kelola deployment > URL Aplikasi web, berakhiran /exec) */
-        const API_URL = 'https://script.google.com/macros/s/AKfycbzC78EutO16od83C5_Y1En0TWZZqZCmQiv2GkLQ7ewWOoGVjE1r8pBdw9LSB34pklEkDw/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycby9LcD2lciCREhTSqz6rkDHzk1qV59iVZ6uDO5Gclot90seJq0kcks9AiON0W1HWxmpyw/exec';
         let perluKode = false, memKode = '';
         function getKode() { try { return localStorage.getItem('bilik_kode') || memKode; } catch (e) { return memKode; } }
         function setKode(k) { memKode = k; try { localStorage.setItem('bilik_kode', k); } catch (e) {} }
@@ -555,7 +606,8 @@
                 cekkode: a => ({ api: 'cekkode', kode: a[0] }),
                 loginVoterByNik: a => ({ api: 'login', nik: a[0], kode: getKode() }),
                 submitElectorateVote: a => ({ api: 'vote', token: a[0], candidateId: a[1] }),
-                rekapTps: a => ({ api: 'rekap', kode: getKode(), pin: a[0] })   // hanya kode perangkat + PIN; TPS ditentukan server
+                rekapTps: a => ({ api: 'rekap', kode: getKode(), pin: a[0] }),
+                cekStruk: a => ({ api: 'cekstruk', kode: getKode(), pin: a[0], items: a[1] || [] })   // hanya kode perangkat + PIN; TPS ditentukan server
             };
             if (!/^https:\/\//.test(API_URL)) return Promise.reject(new Error('Alamat Web App belum diisi di file index.html (konstanta API_URL).'));
             return fetch(API_URL, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=utf-8' }, body: JSON.stringify(map[fn](args)) })
@@ -641,13 +693,13 @@
             s.textContent = '@media print{' + css + '}';
         }
         /* Struk audit 58 mm: hanya pilihan calon, TANPA nama/NIK pemilih (menjaga kerahasiaan) */
-        function printVoteSlipBrowser(c, done, kode, tps, voteTime) {
+        function printVoteSlipBrowser(c, done, kode, tps, voteTime, struk) {
             const test = !c;
-            const desa = (appSet.Nama_Desa || 'Salamjaya').toUpperCase();
-            const tpsNo = tps || '1';
+            const desa = struk ? struk.desa : (appSet.Nama_Desa || 'Salamjaya').toUpperCase();
+            const tpsNo = struk ? struk.tps : (tps || '1');
             
             // Format tanggal dan jam presisi (contoh: 01/11/2026, 04.30.15)
-            const timeStr = voteTime ? voteTime.toLocaleString('id-ID', { 
+            const timeStr = struk ? struk.waktu : voteTime ? voteTime.toLocaleString('id-ID', { 
                 day: '2-digit', month: '2-digit', year: 'numeric', 
                 hour: '2-digit', minute: '2-digit', second: '2-digit', 
                 hour12: false 
@@ -660,12 +712,13 @@
             const ok = !!kode;
 
             // Data lengkap yang otomatis tersemat di dalam QR Code untuk keperluan audit
-            const qrPayload = ok ? JSON.stringify({
+            // Dengan struk dari server: kode, desa, tps, waktu (jam server), pilihan (nomor urut), sig (ECDSA)
+            const qrPayload = ok ? (struk ? JSON.stringify(struk) : JSON.stringify({
                 kode: kode,
                 desa: desa,
                 tps: tpsNo,
                 waktu: timeStr
-            }) : '';
+            })) : '';
 
             document.getElementById('print-area').innerHTML = `
                 <style>#slip-qr img,#slip-qr canvas{width:100%!important;height:100%!important}</style>
@@ -686,7 +739,7 @@
             if (ok && typeof QRCode !== 'undefined') {
                 const lvl = (QRCode.CorrectLevel || {}).M;
                 // Memasukkan qrPayload (berisi kode, desa, tps, dan waktu) ke dalam QR Code
-                new QRCode(document.getElementById('slip-qr'), Object.assign({ text: qrPayload, width: 128, height: 128 }, lvl !== undefined ? { correctLevel: lvl } : {}));
+                new QRCode(document.getElementById('slip-qr'), Object.assign({ text: qrPayload, width: 272, height: 272 }, lvl !== undefined ? { correctLevel: lvl } : {}));
             }
             setPage('@page { size: 58mm auto; margin: 0; }');
             let fin = false;
@@ -833,8 +886,8 @@
                 return false;
             }
         }
-        function printVoteSlip(c, done, kode, tps, voteTime) {
-            if (!useRawBT()) return printVoteSlipBrowser(c, done, kode, tps, voteTime);
+        function printVoteSlip(c, done, kode, tps, voteTime, struk) {
+            if (!useRawBT()) return printVoteSlipBrowser(c, done, kode, tps, voteTime, struk);
 
             const test = !c;
             const desa = (appSet.Nama_Desa || 'Salamjaya').toUpperCase();
@@ -850,6 +903,7 @@
                 test, desa, tps: tpsNo, waktu, kode,
                 qr: kode ? JSON.stringify({ kode, desa, tps: tpsNo, waktu }) : ''
             };
+            if (struk) { slip.kode = struk.kode; slip.desa = struk.desa; slip.tps = struk.tps; slip.waktu = struk.waktu; slip.qr = JSON.stringify(struk); }   // data bertanda tangan dari server
             // Mode_Struk: "gambar" (standar, dengan QR) atau "teks" (teks biasa tanpa QR, seperti versi awal)
             const modeStruk = String(appSet.Mode_Struk || '').trim().toLowerCase();
             slip.noQr = modeStruk === 'teks';
@@ -863,6 +917,174 @@
             if (!ok2) alert('Gagal mengirim struk ke RawBT. Pastikan aplikasi RawBT terpasang.');
             setTimeout(() => { if (done) done(); }, 1500);
         }
+        /* ===== AUDIT STRUK (hitung ulang struk fisik di kotak audit) =====
+           Alur: PIN -> pindai QR semua struk -> tiap struk diperiksa TANDA TANGAN ECDSA (kunci publik dari server, diperiksa
+           di tablet lewat WebCrypto) + jam sah + TPS -> "Cocokkan dengan Log" -> server membandingkan kode & pilihan dengan Log_Struk.
+           Pilihan per struk tidak ditampilkan di layar; hanya total per calon di ringkasan akhir. */
+        let auditState = null, auditScanner = null, auditBusy = false, auditNoteAt = 0;
+        function auditEl(id) { return document.getElementById(id); }
+        function auditB64uToBytes(t) {
+            t = String(t).replace(/-/g, '+').replace(/_/g, '/');
+            while (t.length % 4) t += '=';
+            const bin = atob(t), out = new Uint8Array(bin.length);
+            for (let i = 0; i < bin.length; i++) out[i] = bin.charCodeAt(i);
+            return out;
+        }
+        async function auditSidik(kunci) {
+            const x = auditB64uToBytes(kunci.x), y = auditB64uToBytes(kunci.y), all = new Uint8Array(x.length + y.length);
+            all.set(x, 0); all.set(y, x.length);
+            const h = new Uint8Array(await crypto.subtle.digest('SHA-256', all)).slice(0, 8);
+            const hex = Array.from(h).map(b => b.toString(16).padStart(2, '0')).join('').toUpperCase();
+            return hex.match(/.{4}/g).join('-');
+        }
+        async function auditVerify(o, key) {
+            try {
+                const sig = auditB64uToBytes(o.sig);
+                if (sig.length !== 64) return false;
+                const msg = new TextEncoder().encode([o.kode, o.desa, o.tps, o.pilihan, o.waktu].join('|'));
+                return await crypto.subtle.verify({ name: 'ECDSA', hash: 'SHA-256' }, key, sig, msg);
+            } catch (e) { return false; }
+        }
+        /* Struk sah hanya pada hari H antara jam mulai dan jam selesai (sampai akhir menit jam selesai). ok: true / false / null (belum bisa dinilai) */
+        function auditJamOk(waktu, jam) {
+            const m = String(waktu).match(/^(\d{2})\/(\d{2})\/(\d{4}) (\d{2})\.(\d{2})\.(\d{2})$/);
+            if (!m) return { ok: false, alasan: 'format waktu salah' };
+            if (!jam || !jam.tanggal) return { ok: null, alasan: 'Tanggal_Pemilihan belum diisi' };
+            if (m[3] + '-' + m[2] + '-' + m[1] !== jam.tanggal) return { ok: false, alasan: 'bukan hari pemilihan' };
+            const hm = m[4] + ':' + m[5];
+            if (hm < jam.mulai || hm > jam.selesai) return { ok: false, alasan: 'di luar jam ' + jam.mulai + '-' + jam.selesai };
+            return { ok: true };
+        }
+        function openAudit() {
+            stopScanner();
+            auditStopCam();
+            auditState = null;
+            auditEl('audit-err').textContent = ''; auditEl('audit-pin').value = '';
+            auditEl('audit-pin-wrap').classList.remove('hidden');
+            auditEl('audit-main').classList.add('hidden');
+            auditEl('audit-start').classList.remove('hidden'); auditEl('audit-match').classList.add('hidden');
+            auditEl('audit-result').innerHTML = ''; auditEl('audit-last').textContent = ''; auditEl('audit-count').textContent = '';
+            auditEl('modal-audit').classList.remove('hidden');
+            setTimeout(() => { try { auditEl('audit-pin').focus(); } catch (e) {} }, 100);
+        }
+        function auditStopCam() {
+            const sc = auditScanner; auditScanner = null;
+            if (!sc) return Promise.resolve();
+            return sc.stop().then(() => sc.clear()).catch(() => {});
+        }
+        function closeAudit() {
+            auditStopCam();
+            auditState = null;
+            auditEl('audit-pin').value = '';
+            auditEl('modal-audit').classList.add('hidden');
+            if (currentPage === 'voterlogin') toggleLoginMode('scan');
+        }
+        function auditMulai(e) {
+            e.preventDefault();
+            const pin = auditEl('audit-pin').value.trim(), err = auditEl('audit-err'), btn = auditEl('audit-start');
+            err.textContent = ''; btn.disabled = true;
+            gs('cekStruk', pin, []).then(async d => {
+                if (!d.kunci) throw new Error('Kunci tanda tangan belum dibuat. Jalankan menu E-Voting > Buat kunci tanda tangan struk di Google Sheets.');
+                if (!(window.crypto && crypto.subtle)) throw new Error('Pemeriksaan tanda tangan butuh halaman HTTPS.');
+                const key = await crypto.subtle.importKey('jwk', { kty: 'EC', crv: 'P-256', x: d.kunci.x, y: d.kunci.y, ext: true }, { name: 'ECDSA', namedCurve: 'P-256' }, false, ['verify']);
+                const sidik = await auditSidik(d.kunci);
+                auditState = { pin, tps: String(d.tps).trim(), key, sidik, jam: d.jam || {}, totalLog: d.totalLog || 0, items: new Map(), hasil: null };
+                auditEl('audit-pin-wrap').classList.add('hidden');
+                auditEl('audit-start').classList.add('hidden'); auditEl('audit-match').classList.remove('hidden');
+                auditEl('audit-main').classList.remove('hidden');
+                auditEl('audit-info').innerHTML = 'TPS <b>' + esc(auditState.tps) + '</b> &middot; struk di Log_Struk: <b>' + auditState.totalLog + '</b><br>Sidik jari kunci: <b style="font-family:monospace">' + esc(sidik) + '</b> (samakan dengan berita acara)'
+                    + (d.jam && d.jam.tanggal ? '<br>Struk sah: ' + esc(d.jam.tanggal) + ' pukul ' + esc(d.jam.mulai) + '-' + esc(d.jam.selesai) : '<br><span style="color:#b45309">Tanggal_Pemilihan belum diisi: keabsahan jam tidak dinilai.</span>');
+                auditUpdateCount();
+                await auditStartCam();
+            }).catch(ex => { err.textContent = errMsg(ex); })
+              .finally(() => { btn.disabled = false; });
+        }
+        async function auditStartCam() {
+            await auditStopCam();
+            try {
+                const sc = new Html5Qrcode('audit-reader', { formatsToSupport: [Html5QrcodeSupportedFormats.QR_CODE], experimentalFeatures: { useBarCodeDetectorIfSupported: true }, verbose: false });
+                await sc.start({ facingMode: 'environment' }, { fps: 10, qrbox: { width: 240, height: 240 } }, auditOnScan, () => {});
+                auditScanner = sc;
+            } catch (e) {
+                auditEl('audit-err').textContent = 'Kamera tidak bisa dibuka. Izinkan kamera untuk halaman ini lalu tekan Tutup dan buka Audit Struk lagi.';
+            }
+        }
+        function auditNote(teks, bad) {
+            const now = Date.now();
+            if (now - auditNoteAt < 1200) return;   // cegah kedip saat QR yang sama terbaca berulang
+            auditNoteAt = now;
+            const el = auditEl('audit-last'); el.textContent = teks; el.style.color = bad ? '#dc2626' : '#15803d';
+        }
+        async function auditOnScan(text) {
+            if (!auditState || auditBusy) return;
+            let o = null;
+            try { o = JSON.parse(text); } catch (e) {}
+            const f = ['kode', 'desa', 'tps', 'waktu', 'pilihan', 'sig'];
+            if (!o || typeof o !== 'object' || f.some(k => typeof o[k] !== 'string' || !o[k].trim())) return auditNote('QR bukan struk yang bertanda tangan.', true);
+            const kode = o.kode.trim();
+            const ada = auditState.items.get(kode);
+            if (ada) {
+                if (ada.raw !== text && !ada.ganda) { ada.ganda = true; auditUpdateCount(); return auditNote('Kode ' + kode + ' muncul dengan isi BERBEDA (struk ganda).', true); }
+                return auditNote('Struk ' + kode + ' sudah dipindai.', false);
+            }
+            auditBusy = true;
+            try {
+                const sigOk = await auditVerify(o, auditState.key);
+                const jam = auditJamOk(o.waktu, auditState.jam);
+                const tpsOk = String(o.tps).trim() === auditState.tps;
+                auditState.items.set(kode, { kode, tps: String(o.tps).trim(), pilihan: String(o.pilihan).trim(), sigOk, jam, tpsOk, ganda: false, raw: text });
+                try { playBeepSound(); } catch (e) {}
+                auditNote(kode + ' - ' + (sigOk ? 'tanda tangan sah' : 'TANDA TANGAN TIDAK SAH') + (sigOk && jam.ok === false ? ', ' + jam.alasan : '') + (tpsOk ? '' : ', BUKAN TPS INI'), !sigOk || jam.ok === false || !tpsOk);
+                auditUpdateCount();
+            } finally { auditBusy = false; }
+        }
+        function auditUpdateCount() {
+            const it = Array.from(auditState.items.values());
+            const buruk = it.filter(x => !x.sigOk || x.jam.ok === false || !x.tpsOk || x.ganda).length;
+            auditEl('audit-count').innerHTML = 'Dipindai: <b>' + it.length + '</b> dari ' + auditState.totalLog + ' &middot; bermasalah: <b style="color:' + (buruk ? '#dc2626' : '#15803d') + '">' + buruk + '</b>';
+        }
+        function auditCocokkan() {
+            const st = auditState, btn = auditEl('audit-match'), err = auditEl('audit-err');
+            if (!st) return;
+            if (!st.items.size) { err.textContent = 'Belum ada struk yang dipindai.'; return; }
+            err.textContent = ''; btn.disabled = true;
+            const items = Array.from(st.items.values()).map(x => ({ kode: x.kode, tps: x.tps, pilihan: x.pilihan }));
+            gs('cekStruk', st.pin, items).then(d => { st.hasil = d; auditRender(d); })
+                .catch(ex => { err.textContent = errMsg(ex); })
+                .finally(() => { btn.disabled = false; });
+        }
+        function auditRender(d) {
+            const st = auditState, it = Array.from(st.items.values());
+            const stat = {}; (d.hasil || []).forEach(h => { stat[h.kode] = h; });
+            const daftar = (arr, f) => arr.length ? '<div style="font-family:monospace;font-size:12px;word-break:break-all;margin:2px 0 6px">' + arr.slice(0, 30).map(f).join(', ') + (arr.length > 30 ? ' ... (+' + (arr.length - 30) + ')' : '') + '</div>' : '';
+            const bad = { ttd: it.filter(x => !x.sigOk), jam: it.filter(x => x.sigOk && x.jam.ok === false), tps: it.filter(x => !x.tpsOk), ganda: it.filter(x => x.ganda) };
+            const hs = d.hasil || [];
+            const cocok = hs.filter(h => h.status === 'COCOK').length;
+            const beda = hs.filter(h => h.status === 'PILIHAN_BEDA'), tidakAda = hs.filter(h => h.status === 'TIDAK_ADA'), tpsBeda = hs.filter(h => h.status === 'TPS_BEDA');
+            const hilang = d.hilang || [];
+            // total per calon dari struk yang tanda tangannya sah dan TPS-nya benar vs total Log_Struk
+            const perStruk = {}; it.filter(x => x.sigOk && x.tpsOk).forEach(x => { perStruk[x.pilihan] = (perStruk[x.pilihan] || 0) + 1; });
+            const kand = d.kand || [];
+            const baris = kand.map(k => { const a = perStruk[k.noUrut] || 0, b = (d.perNo || {})[k.noUrut] || 0; return '<tr' + (a !== b ? ' style="color:#dc2626;font-weight:800"' : '') + '><td>' + esc(k.noUrut + '. ' + k.nama) + '</td><td style="text-align:right">' + a + '</td><td style="text-align:right">' + b + '</td></tr>'; }).join('');
+            const adaMasalah = bad.ttd.length || bad.jam.length || bad.tps.length || bad.ganda.length || beda.length || tidakAda.length || tpsBeda.length || hilang.length || it.length !== d.totalLog;
+            const sec = (t, n, isi) => n ? '<div style="margin-top:6px"><b style="color:#dc2626">' + t + ': ' + n + '</b>' + isi + '</div>' : '';
+            auditEl('audit-result').innerHTML =
+                '<div style="padding:10px;border-radius:12px;font-weight:800;text-align:center;background:' + (adaMasalah ? '#fee2e2;color:#991b1b' : '#dcfce7;color:#166534') + '">' + (adaMasalah ? 'ADA TEMUAN - periksa dan catat di berita acara' : 'SEMUA STRUK COCOK DENGAN LOG') + '</div>'
+                + '<table style="width:100%;margin-top:8px"><tr><td>Struk dipindai</td><td style="text-align:right"><b>' + it.length + '</b></td></tr>'
+                + '<tr><td>Struk di Log_Struk TPS ' + esc(st.tps) + '</td><td style="text-align:right"><b>' + d.totalLog + '</b></td></tr>'
+                + '<tr><td>Cocok dengan Log (kode, TPS, pilihan)</td><td style="text-align:right"><b>' + cocok + '</b></td></tr></table>'
+                + sec('Tanda tangan tidak sah (kemungkinan struk palsu/diubah)', bad.ttd.length, daftar(bad.ttd, x => esc(x.kode)))
+                + sec('Waktu di luar jam/hari sah', bad.jam.length, daftar(bad.jam, x => esc(x.kode + ' (' + x.jam.alasan + ')')))
+                + sec('Struk dari TPS lain', bad.tps.length, daftar(bad.tps, x => esc(x.kode)))
+                + sec('Kode ganda dengan isi berbeda', bad.ganda.length, daftar(bad.ganda, x => esc(x.kode)))
+                + sec('Pilihan di struk BEDA dengan Log_Struk (log kemungkinan diubah)', beda.length, daftar(beda, h => esc(h.kode + ' (log: ' + h.log + ')')))
+                + sec('Kode struk tidak ada di Log_Struk', tidakAda.length, daftar(tidakAda, h => esc(h.kode)))
+                + sec('TPS di log berbeda', tpsBeda.length, daftar(tpsBeda, h => esc(h.kode)))
+                + sec('Ada di Log_Struk tetapi struk fisik belum dipindai', hilang.length, daftar(hilang, k => esc(k)))
+                + '<div style="font-weight:800;font-size:12px;letter-spacing:.1em;color:#64748b;margin:12px 0 4px">TOTAL PER CALON</div>'
+                + '<table style="width:100%"><tr style="color:#64748b;font-size:12px"><td></td><td style="text-align:right">Struk</td><td style="text-align:right">Log</td></tr>' + baris + '</table>';
+            auditEl('audit-result').scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
         /* ===== REKAPITULASI PER TPS =====
            Aturan keamanan: tablet TIDAK pernah mengirim nomor TPS. Server menentukan TPS dari kode perangkat
            tablet ini, lalu hanya mengembalikan rekap TPS tersebut (dan hanya bila panitia sudah membukanya). */
@@ -872,6 +1094,8 @@
             const b = document.getElementById('btn-rekap');
             const tampil = !!(perluKode && getKode() && rekapOn());
             if (b) b.classList.toggle('hidden', !tampil);
+            const ba = document.getElementById('btn-audit');
+            if (ba) ba.classList.toggle('hidden', !tampil);
             const w = document.getElementById('kode-rekap-wrap');
             if (w) w.classList.toggle('hidden', !tampil);
         }
@@ -1049,6 +1273,44 @@
         }
 
         let currentPage = 'voterlogin';
+
+        /* ===== MODE KIOSK PEMILIH: header & footer disembunyikan; tombol panitia dipindah ke menu roda gigi (kiri bawah) ===== */
+        function kioskInit() {
+            const menu = document.getElementById('kiosk-menu');
+            if (!menu || menu.dataset.ready) return;
+            menu.dataset.ready = '1';
+            ['nav-public', 'btn-kode', 'btn-rekap', 'btn-audit'].forEach(id => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.classList.add('kiosk-item');
+                menu.appendChild(el);
+            });
+        }
+        function closeKioskMenu() { const m = document.getElementById('kiosk-menu'); if (m) m.classList.add('hidden'); }
+        function toggleKioskMenu() {
+            const m = document.getElementById('kiosk-menu');
+            if (!m) return;
+            if (m.classList.contains('hidden')) {
+                const ada = Array.from(m.children).some(c => c.id !== 'kiosk-empty' && !c.classList.contains('hidden'));
+                document.getElementById('kiosk-empty').classList.toggle('hidden', ada);
+                m.classList.remove('hidden');
+            } else m.classList.add('hidden');
+        }
+        function kioskApply() {
+            const on = (currentPage === 'voterlogin' || currentPage === 'voting') && !adminToken;
+            document.body.classList.toggle('kiosk-voter', on);
+            const g = document.getElementById('kiosk-gear');
+            const tampilGear = on && currentPage === 'voterlogin';
+            if (g) g.classList.toggle('hidden', !tampilGear);
+            if (!tampilGear) closeKioskMenu();
+        }
+        document.addEventListener('click', e => {
+            const m = document.getElementById('kiosk-menu');
+            if (!m || m.classList.contains('hidden')) return;
+            if (e.target.closest('#kiosk-gear')) return;
+            closeKioskMenu();   // klik di dalam menu (memilih item) atau di luar menu menutupnya
+        });
+        kioskInit();
         function fsOn() { return !!(document.fullscreenElement || document.webkitFullscreenElement); }
         function fsSupported() { return !!(document.fullscreenEnabled || document.webkitFullscreenEnabled); }
         function goFullscreen() {
@@ -1120,6 +1382,7 @@
                 document.getElementById('login-error-msg').classList.add('hidden');
                 toggleLoginMode('scan');
             } else { stopScanner(); }
+            kioskApply();
             updateFsButton();
             window.scrollTo({ top: 0 });
         }
@@ -1166,6 +1429,13 @@
         let scannerChain = Promise.resolve();
         function startScanner() { scannerChain = scannerChain.then(doStartScanner).catch(() => {}); }
         
+        function scanCfg() {
+            const box = document.querySelector('.scan-box');
+            const ar = box && box.clientHeight ? box.clientWidth / box.clientHeight : 0;
+            const cfg = { fps: 15, qrbox: (w, h) => ({ width: Math.floor(w * 0.9), height: Math.floor(h * 0.62) }) };
+            if (ar > 0.3 && ar < 4) cfg.aspectRatio = ar;   // video mengikuti bentuk kotak kamera
+            return cfg;
+        }
         function doStartScanner() {
             if (html5QrcodeScanner) return;
             const km = document.getElementById('modal-kode');
@@ -1175,7 +1445,7 @@
                 experimentalFeatures: { useBarCodeDetectorIfSupported: true },
                 verbose: false
             });
-            return sc.start({ facingMode: 'environment' }, { fps: 15, qrbox: { width: 260, height: 160 } }, onScanSuccess, onScanFailure)
+            return sc.start({ facingMode: 'environment' }, scanCfg(), onScanSuccess, onScanFailure)
                 .then(() => { html5QrcodeScanner = sc; })
                 .catch(() => {
                     html5QrcodeScanner = null;
@@ -1309,7 +1579,7 @@
             
             // Perbaikan render kartu calon agar responsif disentuh/diklik
             inner.innerHTML = candidates.map(c => `
-                <div class="sb-card" data-id="${esc(c.id)}" style="cursor: pointer; position: relative; z-index: 5;" onclick="confirmVoteCandidate('${esc(c.id)}')">
+                <div class="sb-card" data-id="${esc(c.id)}" style="cursor: pointer; position: relative; z-index: 5;" onclick="pilihKartu('${esc(c.id)}')">
                     <div class="sb-no">${parseInt(c.number, 10) || esc(c.number)}</div>
                     <div class="sb-photo"><img src="${esc(c.photo)}" alt="${esc(c.name)}" onerror="this.onerror=null;this.src=PH"></div>
                     <div class="sb-name">${esc(c.name)}</div>
@@ -1340,20 +1610,47 @@
         window.addEventListener('resize', layoutBallot);
         window.addEventListener('orientationchange', () => setTimeout(layoutBallot, 250));
 
-        function confirmVoteCandidate(candidateId) {
+        function pilihKartu(candidateId) {
             const c = candidates.find(x => x.id === candidateId);
             if (!c) return;
             selectedCandidateForVote = c;
             document.querySelectorAll('#sb-inner .sb-card').forEach(el => el.classList.toggle('sel', el.dataset.id === c.id));
             document.getElementById('voting-candidates-grid').classList.add('has-sel');
-            
-            // Mengisi data ke modal konfirmasi (Angka besar di atas, foto di tengah, nama di bawah)
+            updatePilihPill();
+            resetIdle();
+        }
+        function updatePilihPill() {
+            const b = document.getElementById('sb-hint');
+            if (!b) return;
+            const c = selectedCandidateForVote;
+            b.classList.toggle('off', !c);
+            b.disabled = !c;
+            b.textContent = c ? 'Pilih Kandidat Ini' : 'Ketuk Foto Calon Pilihan Anda';
+        }
+        /* Foto di halaman konfirmasi dibuat sama besar dengan foto di surat suara, tetapi dibatasi agar tombol selalu terlihat */
+        function fitConfirmCard() {
+            const m = document.getElementById('modal-confirm-vote'), card = document.getElementById('cf-card');
+            if (!m || !card || m.classList.contains('hidden')) return;
+            const land = window.innerWidth > window.innerHeight;
+            const sel = selectedCandidateForVote && Array.from(document.querySelectorAll('#sb-inner .sb-card')).find(el => el.dataset.id === selectedCandidateForVote.id);
+            let w = sel ? sel.getBoundingClientRect().width : 200;
+            const maxH = window.innerHeight * (land ? 0.80 : 0.46);
+            const maxW = window.innerWidth * (land ? 0.38 : 0.80);
+            if (w * 1.75 > maxH) w = maxH / 1.75;
+            w = Math.max(110, Math.min(w, maxW));
+            card.style.setProperty('--cfw', Math.floor(w) + 'px');
+        }
+        window.addEventListener('resize', fitConfirmCard);
+        window.addEventListener('orientationchange', () => setTimeout(fitConfirmCard, 250));
+        function bukaKonfirmasi() {
+            const c = selectedCandidateForVote;
+            if (!c) return;
             document.getElementById('cf-img').src = c.photo;
-            document.getElementById('cf-no').textContent = parseInt(c.number, 10) || c.number; // Menampilkan angka nomor urut saja secara besar
+            document.getElementById('cf-no').textContent = parseInt(c.number, 10) || c.number;
             document.getElementById('cf-name').textContent = c.name;
-            
-            document.getElementById('confirm-btn-label').textContent = slipOn() ? 'Simpan & Cetak Hasil' : 'Simpan Pilihan';
+            document.getElementById('confirm-btn-label').textContent = 'Pilih';
             document.getElementById('modal-confirm-vote').classList.remove('hidden');
+            fitConfirmCard();
             resetIdle();
         }
 
@@ -1362,6 +1659,7 @@
             document.querySelectorAll('#sb-inner .sb-card').forEach(el => el.classList.remove('sel'));
             const g = document.getElementById('voting-candidates-grid'); if (g) g.classList.remove('has-sel');
             const m = document.getElementById('modal-confirm-vote'); if (m) m.classList.add('hidden');
+            updatePilihPill();
         }
 
         function submitVote() {
@@ -1394,7 +1692,7 @@
                     title.textContent = 'Suara Tersimpan';
                     sub.textContent = 'Mencetak struk, mohon tunggu...';
                     // Kirim tps dan voteTime ke fungsi printVoteSlip
-                    printVoteSlip(cand, showThanks, res && res.kode, voterTps, voteTime);
+                    printVoteSlip(cand, showThanks, res && res.kode, voterTps, voteTime, res && res.struk);
                 } else showThanks();
                 if (adminToken) loadPublicData(true);
             }).catch(err => {
