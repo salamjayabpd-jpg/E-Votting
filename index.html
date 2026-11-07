@@ -327,24 +327,22 @@ body.kiosk-voter #page-voterlogin > div { max-width: min(680px, 94vw) !important
 .sb-grid.has-sel .sb-card:not(.sel) { opacity: .25 !important; }
 button.sb-pill { border: 0; width: min(92vw, 720px); font-family: inherit; cursor: pointer; background: #2563eb; box-shadow: 0 8px 22px rgba(37,99,235,.4); }
 button.sb-pill.off { background: #94a3b8; box-shadow: none; cursor: default; }
-/* halaman konfirmasi: foto sama dengan ukuran di surat suara, tombol selalu terlihat */
-#modal-confirm-vote .cf2 { width: min(94vw, 560px); max-width: none; max-height: 96vh; max-height: 96dvh; overflow: auto; box-sizing: border-box; padding: 18px 22px; border-radius: 28px; background: #fff !important; color: #0f172a; box-shadow: 0 25px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
-#modal-confirm-vote .cf2-card { --cfw: 200px; width: var(--cfw); box-sizing: border-box; flex: 0 0 auto; padding: calc(var(--cfw)*.05); border: calc(var(--cfw)*.014 + 1px) solid #231f20; border-radius: 12px; background: #fff; }
+/* halaman konfirmasi: layar penuh putih, ukuran sama dengan halaman pilihan kandidat */
+#modal-confirm-vote { position: fixed; inset: 0; z-index: 60; width: 100%; height: 100vh; height: 100dvh; padding: 0; background: #fff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; display: flex; align-items: stretch; justify-content: center; }
+#modal-confirm-vote.hidden { display: none !important; }
+#modal-confirm-vote .cf2 { width: 100%; height: 100%; max-width: none; max-height: none; box-sizing: border-box; padding: 3vh 5vw; border: 0; border-radius: 0; background: #fff !important; color: #231f20; box-shadow: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.8vh; text-align: center; overflow-y: auto; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+#modal-confirm-vote .cf2-ico { width: clamp(64px, 10vh, 110px); height: clamp(64px, 10vh, 110px); flex: 0 0 auto; display: block; }
+#modal-confirm-vote .cf2-title { margin: 0; font-size: clamp(24px, 4.4vh, 40px); font-weight: 800; color: #000; line-height: 1.15; }
+#modal-confirm-vote .cf2-q { margin: 0; font-size: clamp(16px, 3vh, 28px); font-weight: 800; color: #dc2626; line-height: 1.3; }
+#modal-confirm-vote .cf2-card { --cfw: 200px; width: var(--cfw); box-sizing: border-box; flex: 0 0 auto; padding: calc(var(--cfw)*.05); border: calc(var(--cfw)*.02 + 1px) solid #231f20; border-radius: calc(var(--cfw)*.07); background: #fff; }
 #modal-confirm-vote .cf2-no { font-size: calc(var(--cfw)*.16); font-weight: 800; color: #231f20; line-height: 1.1; }
 #modal-confirm-vote .cf2-photo { width: 100%; aspect-ratio: 3/4; border: 1px solid #231f20; background: #e5e7eb; overflow: hidden; }
 #modal-confirm-vote .cf2-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 #modal-confirm-vote .cf2-name { font-size: max(12px, calc(var(--cfw)*.075)); font-weight: 800; text-transform: uppercase; color: #231f20; line-height: 1.2; min-height: calc(var(--cfw)*.18); margin-top: calc(var(--cfw)*.03); display: flex; align-items: center; justify-content: center; }
-#modal-confirm-vote .cf2-side { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
-#modal-confirm-vote .cf2-title { margin: 0; font-size: clamp(22px, 4vh, 32px); font-weight: 900; color: #000; line-height: 1.15; }
-#modal-confirm-vote .cf2-q { margin: 0; font-size: clamp(16px, 2.8vh, 22px); font-weight: 800; color: #dc2626; line-height: 1.3; }
-#modal-confirm-vote .cf2-btns { display: flex; gap: 12px; width: 100%; margin-top: 4px; }
-#modal-confirm-vote .cf2-btn { flex: 1; min-height: 58px; border: 0; border-radius: 16px; color: #fff; font-weight: 900; font-size: clamp(17px, 3vh, 22px); cursor: pointer; }
-#modal-confirm-vote .cf2-ulang { background: #dc2626; box-shadow: 0 8px 20px rgba(220,38,38,.3); }
-#modal-confirm-vote .cf2-pilih { background: #2563eb; flex: 1.4; box-shadow: 0 8px 20px rgba(37,99,235,.35); }
-@media (orientation: landscape) {
-  #modal-confirm-vote .cf2 { width: min(94vw, 900px); flex-direction: row; align-items: center; gap: 28px; padding: 18px 26px; }
-  #modal-confirm-vote .cf2-side { flex: 1; min-width: 0; }
-}
+#modal-confirm-vote .cf2-btns { display: flex; gap: 14px; width: min(88vw, 820px); margin-top: 1.5vh; flex: 0 0 auto; }
+#modal-confirm-vote .cf2-btn { flex: 1; min-height: max(56px, 7.5vh); border: 0; border-radius: 999px; color: #fff; font-weight: 800; font-size: clamp(18px, 3.2vh, 28px); cursor: pointer; font-family: inherit; }
+#modal-confirm-vote .cf2-ulang { background: #dc2626; }
+#modal-confirm-vote .cf2-pilih { background: #2563eb; }
 </style>
 </head>
 <body class="kiosk-voter h-full bg-slate-900 text-slate-100 antialiased flex flex-col justify-between selection:bg-blue-500 selection:text-white">
@@ -477,18 +475,21 @@ button.sb-pill.off { background: #94a3b8; box-shadow: none; cursor: default; }
     <!-- 3. CONFIRM VOTE MODAL -->
     <div id="modal-confirm-vote" class="hidden sb-modal sb-cf-back">
         <div class="cf2">
+            <svg class="cf2-ico" viewBox="0 0 100 100" aria-hidden="true">
+                <circle cx="50" cy="50" r="48" fill="#e5e5e5" stroke="#cbbf9f" stroke-width="3"/>
+                <path d="M30 42 L45 57 L70 30" fill="none" stroke="#c98a3a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+                <path d="M30 60 L45 75 L70 48" fill="none" stroke="#c98a3a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <h2 class="cf2-title">Konfirmasi Pemilihan</h2>
+            <p class="cf2-q">Apakah Anda yakin akan memilih kandidat ini?</p>
             <div class="cf2-card" id="cf-card">
                 <div class="cf2-no" id="cf-no">1</div>
                 <div class="cf2-photo"><img id="cf-img" alt="" onerror="this.onerror=null;this.src=PH"></div>
                 <div class="cf2-name" id="cf-name">-</div>
             </div>
-            <div class="cf2-side">
-                <h2 class="cf2-title">Konfirmasi Pemilihan</h2>
-                <p class="cf2-q">Apakah Anda yakin akan memilih kandidat ini?</p>
-                <div class="cf2-btns">
-                    <button type="button" class="cf2-btn cf2-ulang" onclick="closeConfirmVoteModal()">Ulangi</button>
-                    <button type="button" class="cf2-btn cf2-pilih" onclick="submitVote()"><span id="confirm-btn-label">Pilih</span></button>
-                </div>
+            <div class="cf2-btns">
+                <button type="button" class="cf2-btn cf2-ulang" onclick="closeConfirmVoteModal()">Ulangi</button>
+                <button type="button" class="cf2-btn cf2-pilih" onclick="submitVote()"><span id="confirm-btn-label">Pilih</span></button>
             </div>
         </div>
     </div>
@@ -595,7 +596,7 @@ button.sb-pill.off { background: #94a3b8; box-shadow: none; cursor: default; }
         const PH = 'data:image/svg+xml;utf8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="200" height="240"><rect width="100%" height="100%" fill="#334155"/><text x="50%" y="50%" fill="#94a3b8" font-size="16" text-anchor="middle">Foto</text></svg>');
 
         /* GANTI dengan alamat Web App Apps Script Anda (Deploy > Kelola deployment > URL Aplikasi web, berakhiran /exec) */
-        const API_URL = 'https://script.google.com/macros/s/AKfycby9LcD2lciCREhTSqz6rkDHzk1qV59iVZ6uDO5Gclot90seJq0kcks9AiON0W1HWxmpyw/exec';
+        const API_URL = 'https://script.google.com/macros/s/AKfycbyv2sogT2iQesuFpctCUnHYClVbHFQL61r615hcsYUL15ZtJHdz3r5W1ChKcALluCMsnA/exec';
         let perluKode = false, memKode = '';
         function getKode() { try { return localStorage.getItem('bilik_kode') || memKode; } catch (e) { return memKode; } }
         function setKode(k) { memKode = k; try { localStorage.setItem('bilik_kode', k); } catch (e) {} }
@@ -1573,8 +1574,14 @@ button.sb-pill.off { background: #94a3b8; box-shadow: none; cursor: default; }
             set('sb-l3', S('Kabupaten') ? 'KABUPATEN ' + S('Kabupaten') : '');
             set('sb-l4', 'TAHUN ' + (S('Tahun') || new Date().getFullYear()));
             const lg = document.getElementById('sb-logos');
+            /* Link Google Drive (file/d/ID/view, open?id=, uc?id=) bukan gambar langsung, jadi diubah ke alamat thumbnail agar tampil */
+            const logoSrc = u => {
+                if (/^data:image\//i.test(u)) return { src: u, alt: '' };
+                const m = /(drive|docs)\.google\.com|googleusercontent\.com/i.test(u) ? u.match(/[-\w]{25,}/) : null;
+                return m ? { src: 'https://drive.google.com/thumbnail?id=' + m[0] + '&sz=w400', alt: 'https://lh3.googleusercontent.com/d/' + m[0] + '=w400' } : { src: u, alt: '' };
+            };
             lg.innerHTML = [appSet.Logo_Kiri, appSet.Logo_Kanan].map(u => String(u || '').trim()).filter(u => /^(https?:\/\/|data:image\/)/i.test(u))
-                .map(u => `<img src="${esc(u)}" alt="" onerror="this.style.display='none'">`).join('');
+                .map(u => { const l = logoSrc(u); return `<img src="${esc(l.src)}" alt="" referrerpolicy="no-referrer" data-alt="${esc(l.alt)}" onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt='';}else{this.style.display='none';}">`; }).join('');
             document.getElementById('sb-head').classList.toggle('nologo', !lg.children.length);
             
             // Perbaikan render kartu calon agar responsif disentuh/diklik
@@ -1631,11 +1638,10 @@ button.sb-pill.off { background: #94a3b8; box-shadow: none; cursor: default; }
         function fitConfirmCard() {
             const m = document.getElementById('modal-confirm-vote'), card = document.getElementById('cf-card');
             if (!m || !card || m.classList.contains('hidden')) return;
-            const land = window.innerWidth > window.innerHeight;
             const sel = selectedCandidateForVote && Array.from(document.querySelectorAll('#sb-inner .sb-card')).find(el => el.dataset.id === selectedCandidateForVote.id);
             let w = sel ? sel.getBoundingClientRect().width : 200;
-            const maxH = window.innerHeight * (land ? 0.80 : 0.46);
-            const maxW = window.innerWidth * (land ? 0.38 : 0.80);
+            const maxH = window.innerHeight * 0.48;   // sisakan ruang untuk ikon, judul, dan tombol
+            const maxW = window.innerWidth * 0.80;
             if (w * 1.75 > maxH) w = maxH / 1.75;
             w = Math.max(110, Math.min(w, maxW));
             card.style.setProperty('--cfw', Math.floor(w) + 'px');
