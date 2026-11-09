@@ -317,17 +317,6 @@ body.kiosk-voter #page-voterlogin > div { max-width: min(680px, 94vw) !important
 .scan-box #reader { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; border: 0 !important; padding: 0 !important; }
 .scan-box #reader > div { position: absolute !important; inset: 0 !important; width: 100% !important; height: 100% !important; min-height: 0 !important; padding: 0 !important; border: 0 !important; }
 .scan-box #reader video { width: 100% !important; height: 100% !important; object-fit: cover !important; display: block !important; }
-/* ===== Halaman Masuk Pemilih: layar penuh, ukuran pas (sama dengan halaman pilih kandidat & konfirmasi) ===== */
-body.kiosk-voter #page-voterlogin:not(.hidden) { position: fixed; inset: 0; z-index: 40; width: 100%; height: 100vh; height: 100dvh; min-height: 0 !important; padding: 2vh 3vw; display: flex; align-items: center; justify-content: center; overflow: hidden; box-sizing: border-box; }
-body.kiosk-voter #page-voterlogin > div { width: min(94vw, 720px); max-width: none !important; max-height: 96vh; max-height: 96dvh; overflow-y: auto; padding: 2.2vh 4vw !important; box-sizing: border-box; display: flex; flex-direction: column; }
-body.kiosk-voter #page-voterlogin > div > .mb-6 { margin-bottom: 1.4vh !important; }
-body.kiosk-voter #page-voterlogin .w-14 { width: 44px; height: 44px; font-size: 20px; }
-body.kiosk-voter #page-voterlogin h3 { font-size: clamp(20px, 3.4vh, 30px); }
-body.kiosk-voter .scan-box { height: min(32vh, 320px); min-height: 150px; }
-body.kiosk-voter #login-mode-scan { flex-shrink: 0; }
-body.kiosk-voter #login-mode-scan.space-y-4 > * + * { margin-top: 1vh; }
-/* pesan kesalahan (mis. "sudah menggunakan hak pilihnya") dibuat besar dan selalu terlihat */
-body.kiosk-voter #login-error-msg { flex-shrink: 0; margin-top: 1.4vh; padding: 1.4vh 3vw; font-size: clamp(15px, 2.6vh, 22px); font-weight: 800; line-height: 1.35; color: #fecaca; background: rgba(220,38,38,.22); border-color: rgba(248,113,113,.6); }
 /* menu panitia (roda gigi) */
 #kiosk-gear { opacity: .4; }
 #kiosk-gear:active { opacity: 1; }
@@ -337,23 +326,25 @@ body.kiosk-voter #login-error-msg { flex-shrink: 0; margin-top: 1.4vh; padding: 
 .sb-card.sel { border-color: #dc2626 !important; box-shadow: 0 0 0 calc(var(--cw)*.025) rgba(220,38,38,.55) !important; transform: scale(1.03) !important; }
 .sb-grid.has-sel .sb-card:not(.sel) { opacity: .25 !important; }
 button.sb-pill { border: 0; width: min(92vw, 720px); font-family: inherit; cursor: pointer; background: #2563eb; box-shadow: 0 8px 22px rgba(37,99,235,.4); }
-button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
-/* halaman konfirmasi: layar penuh putih, ukuran sama dengan halaman pilihan kandidat */
-#modal-confirm-vote { position: fixed; inset: 0; z-index: 60; width: 100%; height: 100vh; height: 100dvh; padding: 0; background: #fff !important; backdrop-filter: none !important; -webkit-backdrop-filter: none !important; display: flex; align-items: stretch; justify-content: center; }
-#modal-confirm-vote.hidden { display: none !important; }
-#modal-confirm-vote .cf2 { width: 100%; height: 100%; max-width: none; max-height: none; box-sizing: border-box; padding: 3vh 5vw; border: 0; border-radius: 0; background: #fff !important; color: #231f20; box-shadow: none; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1.8vh; text-align: center; overflow-y: auto; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
-#modal-confirm-vote .cf2-ico { width: clamp(64px, 10vh, 110px); height: clamp(64px, 10vh, 110px); flex: 0 0 auto; display: block; }
-#modal-confirm-vote .cf2-title { margin: 0; font-size: clamp(24px, 4.4vh, 40px); font-weight: 800; color: #000; line-height: 1.15; }
-#modal-confirm-vote .cf2-q { margin: 0; font-size: clamp(16px, 3vh, 28px); font-weight: 800; color: #dc2626; line-height: 1.3; }
-#modal-confirm-vote .cf2-card { --cfw: 200px; width: var(--cfw); box-sizing: border-box; flex: 0 0 auto; padding: calc(var(--cfw)*.05); border: calc(var(--cfw)*.02 + 1px) solid #231f20; border-radius: calc(var(--cfw)*.07); background: #fff; }
+button.sb-pill.off { background: #94a3b8; box-shadow: none; cursor: default; }
+/* halaman konfirmasi: foto sama dengan ukuran di surat suara, tombol selalu terlihat */
+#modal-confirm-vote .cf2 { width: min(94vw, 560px); max-width: none; max-height: 96vh; max-height: 96dvh; overflow: auto; box-sizing: border-box; padding: 18px 22px; border-radius: 28px; background: #fff !important; color: #0f172a; box-shadow: 0 25px 60px rgba(0,0,0,.35); display: flex; flex-direction: column; align-items: center; gap: 12px; text-align: center; }
+#modal-confirm-vote .cf2-card { --cfw: 200px; width: var(--cfw); box-sizing: border-box; flex: 0 0 auto; padding: calc(var(--cfw)*.05); border: calc(var(--cfw)*.014 + 1px) solid #231f20; border-radius: 12px; background: #fff; }
 #modal-confirm-vote .cf2-no { font-size: calc(var(--cfw)*.16); font-weight: 800; color: #231f20; line-height: 1.1; }
 #modal-confirm-vote .cf2-photo { width: 100%; aspect-ratio: 3/4; border: 1px solid #231f20; background: #e5e7eb; overflow: hidden; }
 #modal-confirm-vote .cf2-photo img { width: 100%; height: 100%; object-fit: cover; display: block; }
 #modal-confirm-vote .cf2-name { font-size: max(12px, calc(var(--cfw)*.075)); font-weight: 800; text-transform: uppercase; color: #231f20; line-height: 1.2; min-height: calc(var(--cfw)*.18); margin-top: calc(var(--cfw)*.03); display: flex; align-items: center; justify-content: center; }
-#modal-confirm-vote .cf2-btns { display: flex; gap: 14px; width: min(88vw, 820px); margin-top: 1.5vh; flex: 0 0 auto; }
-#modal-confirm-vote .cf2-btn { flex: 1; min-height: max(56px, 7.5vh); border: 0; border-radius: 999px; color: #fff; font-weight: 800; font-size: clamp(18px, 3.2vh, 28px); cursor: pointer; font-family: inherit; }
-#modal-confirm-vote .cf2-ulang { background: #dc2626; }
-#modal-confirm-vote .cf2-pilih { background: #2563eb; }
+#modal-confirm-vote .cf2-side { display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%; }
+#modal-confirm-vote .cf2-title { margin: 0; font-size: clamp(22px, 4vh, 32px); font-weight: 900; color: #000; line-height: 1.15; }
+#modal-confirm-vote .cf2-q { margin: 0; font-size: clamp(16px, 2.8vh, 22px); font-weight: 800; color: #dc2626; line-height: 1.3; }
+#modal-confirm-vote .cf2-btns { display: flex; gap: 12px; width: 100%; margin-top: 4px; }
+#modal-confirm-vote .cf2-btn { flex: 1; min-height: 58px; border: 0; border-radius: 16px; color: #fff; font-weight: 900; font-size: clamp(17px, 3vh, 22px); cursor: pointer; }
+#modal-confirm-vote .cf2-ulang { background: #dc2626; box-shadow: 0 8px 20px rgba(220,38,38,.3); }
+#modal-confirm-vote .cf2-pilih { background: #2563eb; flex: 1.4; box-shadow: 0 8px 20px rgba(37,99,235,.35); }
+@media (orientation: landscape) {
+  #modal-confirm-vote .cf2 { width: min(94vw, 900px); flex-direction: row; align-items: center; gap: 28px; padding: 18px 26px; }
+  #modal-confirm-vote .cf2-side { flex: 1; min-width: 0; }
+}
 </style>
 </head>
 <body class="kiosk-voter h-full bg-slate-900 text-slate-100 antialiased flex flex-col justify-between selection:bg-blue-500 selection:text-white">
@@ -484,23 +475,29 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
     
 
     <!-- 3. CONFIRM VOTE MODAL -->
+    <div id="modal-tescetak" class="hidden sb-modal" style="z-index:70">
+        <div class="sb-dialog" style="max-width:440px;max-height:94vh;overflow:auto;text-align:left">
+            <div style="text-align:center;font-weight:800;font-size:18px">TES CETAK STRUK</div>
+            <p style="font-size:12px;color:#64748b;text-align:center;margin:4px 0 10px">Tekan "Tes cetak" pada tiap mode. Pilih mode yang hasilnya ada QR dan kertas berhenti sendiri, lalu tekan "Pakai". Pilihan tersimpan di tablet ini.</p>
+            <div id="tc-list"></div>
+            <label style="display:flex;gap:8px;align-items:center;font-size:13px;color:#0f172a;margin:4px 0 10px"><input type="checkbox" id="tc-potong" onchange="setPotong(this.checked)"> Printer punya pemotong kertas otomatis</label>
+            <div class="sb-dlg-btns"><button type="button" class="sb-btn-sec" onclick="closeTesCetak()">Tutup</button></div>
+        </div>
+    </div>
     <div id="modal-confirm-vote" class="hidden sb-modal sb-cf-back">
         <div class="cf2">
-            <svg class="cf2-ico" viewBox="0 0 100 100" aria-hidden="true">
-                <circle cx="50" cy="50" r="48" fill="#e5e5e5" stroke="#cbbf9f" stroke-width="3"/>
-                <path d="M30 42 L45 57 L70 30" fill="none" stroke="#c98a3a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-                <path d="M30 60 L45 75 L70 48" fill="none" stroke="#c98a3a" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
-            </svg>
-            <h2 class="cf2-title">Konfirmasi Pemilihan</h2>
-            <p class="cf2-q">Apakah Anda yakin akan memilih kandidat ini?</p>
             <div class="cf2-card" id="cf-card">
                 <div class="cf2-no" id="cf-no">1</div>
                 <div class="cf2-photo"><img id="cf-img" alt="" onerror="this.onerror=null;this.src=PH"></div>
                 <div class="cf2-name" id="cf-name">-</div>
             </div>
-            <div class="cf2-btns">
-                <button type="button" class="cf2-btn cf2-ulang" onclick="closeConfirmVoteModal()">Ulangi</button>
-                <button type="button" class="cf2-btn cf2-pilih" onclick="submitVote()"><span id="confirm-btn-label">Pilih</span></button>
+            <div class="cf2-side">
+                <h2 class="cf2-title">Konfirmasi Pemilihan</h2>
+                <p class="cf2-q">Apakah Anda yakin akan memilih kandidat ini?</p>
+                <div class="cf2-btns">
+                    <button type="button" class="cf2-btn cf2-ulang" onclick="closeConfirmVoteModal()">Ulangi</button>
+                    <button type="button" class="cf2-btn cf2-pilih" onclick="submitVote()"><span id="confirm-btn-label">Pilih</span></button>
+                </div>
             </div>
         </div>
     </div>
@@ -561,7 +558,7 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
     
 
     <button id="kiosk-gear" type="button" onclick="toggleKioskMenu()" title="Menu panitia" class="hidden fixed bottom-4 left-4 z-40 w-11 h-11 rounded-full bg-slate-800/90 border border-slate-600 text-slate-200 flex items-center justify-center shadow-lg"><i class="fa-solid fa-gear"></i></button>
-    <div id="kiosk-menu" class="hidden fixed bottom-20 left-4 z-50 flex flex-col gap-1 p-2 rounded-2xl bg-slate-800 border border-slate-600 shadow-2xl"><div id="kiosk-empty" class="hidden text-xs text-slate-400 px-3 py-2">Tidak ada menu</div></div>
+    <div id="kiosk-menu" class="hidden fixed bottom-20 left-4 z-50 flex flex-col gap-1 p-2 rounded-2xl bg-slate-800 border border-slate-600 shadow-2xl"><div id="kiosk-empty" class="hidden text-xs text-slate-400 px-3 py-2">Tidak ada menu</div><button type="button" class="kiosk-item" onclick="openTesCetak()">Tes Cetak Struk</button></div>
     <button id="btn-fs" onclick="goFullscreen()" title="Layar penuh" class="hidden fixed bottom-4 right-4 z-40 w-11 h-11 rounded-full bg-slate-800/90 border border-slate-600 text-slate-200 hover:bg-slate-700 flex items-center justify-center shadow-lg"><i class="fa-solid fa-expand"></i></button>
     <div id="modal-thanks" class="fixed inset-0 z-[60] hidden bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="glass-panel max-w-md w-full p-8 rounded-3xl text-center space-y-3 border border-slate-700">
@@ -809,7 +806,7 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             txt('Masukkan ke kotak audit.\nJangan dibawa pulang.\n');
             align(0);
             txt('\n\n\n');
-            raw(0x1B, 0x64, 4, 0x1D, 0x56, 0x01);    // feed 4 baris + potong parsial (diabaikan bila tanpa cutter)
+            slipTail().forEach(x => out.push(x));   // dorong kertas + potong bila ada pemotong
             return new Uint8Array(out);
         }
         /* Konversi piksel canvas -> bitmap ESC/POS (GS v 0), dipecah per 128 baris agar aman di buffer printer */
@@ -830,27 +827,101 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
                     }
                 }
             }
-            out.push(0x1B, 0x64, 4, 0x1D, 0x56, 0x01); // feed 4 baris + potong parsial
+            slipTail().forEach(x => out.push(x));   // dorong kertas + potong bila ada pemotong
             return new Uint8Array(out);
         }
+        /* ===== MODE CETAK STRUK (dipilih per tablet lewat Menu > Tes Cetak Struk, tersimpan di tablet) =====
+           gambar  : QR dicetak sebagai gambar (GS v 0)        - standar
+           gambar2 : QR dicetak sebagai gambar (ESC *)         - printer lama yang mencetak "kode aneh" pada mode gambar
+           qr      : QR dibuat sendiri oleh printer (GS ( k)    - hanya printer yang mendukung
+           teks    : teks saja tanpa QR */
+        const MODE_STRUK = ['gambar', 'gambar2', 'qr', 'teks'];
+        const MODE_STRUK_INFO = {
+            gambar: ['Gambar (standar)', 'QR dicetak sebagai gambar. Dicoba pertama.'],
+            gambar2: ['Gambar (printer lama)', 'Dipakai bila mode standar mencetak kode aneh dan kertas terus keluar.'],
+            qr: ['QR bawaan printer', 'Printer membuat QR sendiri. Tidak semua printer mendukung.'],
+            teks: ['Teks saja', 'Tanpa QR, hanya kode struk.']
+        };
+        let modeStrukMem = '';
+        function getModeStruk() {
+            let m = modeStrukMem;
+            try { m = localStorage.getItem('modeStruk') || m; } catch (e) {}
+            if (MODE_STRUK.indexOf(m) < 0) m = String(appSet.Mode_Struk || '').trim().toLowerCase();
+            return MODE_STRUK.indexOf(m) >= 0 ? m : 'gambar';
+        }
+        function renderTesCetak() {
+            const aktif = getModeStruk();
+            const cb = document.getElementById('tc-potong'); if (cb) cb.checked = punyaPemotong();
+            document.getElementById('tc-list').innerHTML = MODE_STRUK.map(k =>
+                '<div style="border:2px solid ' + (k === aktif ? '#2563eb' : '#e2e8f0') + ';border-radius:14px;padding:10px 12px;margin-bottom:8px">'
+                + '<div style="font-weight:800;color:#0f172a">' + MODE_STRUK_INFO[k][0] + (k === aktif ? ' <span style="color:#2563eb;font-size:12px">(dipakai)</span>' : '') + '</div>'
+                + '<div style="font-size:12px;color:#64748b;margin:2px 0 8px">' + MODE_STRUK_INFO[k][1] + '</div>'
+                + '<div style="display:flex;gap:8px"><button type="button" class="sb-btn-sec" style="flex:1" onclick="tesCetak(\'' + k + '\')">Tes cetak</button>'
+                + '<button type="button" class="sb-btn-pri" style="flex:1" onclick="pakaiModeStruk(\'' + k + '\')">Pakai</button></div></div>').join('');
+        }
+        function openTesCetak() { renderTesCetak(); document.getElementById('modal-tescetak').classList.remove('hidden'); }
+        function closeTesCetak() { document.getElementById('modal-tescetak').classList.add('hidden'); }
+        function tesCetak(mode) { printVoteSlip(null, null, null, '1', null, null, mode); }
+        function pakaiModeStruk(mode) {
+            modeStrukMem = mode;
+            try { localStorage.setItem('modeStruk', mode); } catch (e) {}
+            renderTesCetak();
+        }
+        /* Bitmap ESC * (24 dot, per pita 24 baris): didukung hampir semua printer termal, termasuk yang tidak mengenal GS v 0 */
+        function packEscStar(data, W, H) {
+            const out = [0x1B, 0x40, 0x1B, 0x61, 0x00, 0x1B, 0x33, 24];   // reset, rata kiri, jarak baris 24 dot
+            for (let y0 = 0; y0 < H; y0 += 24) {
+                out.push(0x1B, 0x2A, 33, W & 255, W >> 8);
+                for (let x = 0; x < W; x++) {
+                    for (let k = 0; k < 3; k++) {
+                        let b = 0;
+                        for (let j = 0; j < 8; j++) {
+                            const y = y0 + k * 8 + j;
+                            if (y < H) {
+                                const i = (y * W + x) * 4;
+                                const lum = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+                                if (lum < 140) b |= (0x80 >> j);
+                            }
+                        }
+                        out.push(b);
+                    }
+                }
+                out.push(0x0A);
+            }
+            out.push(0x1B, 0x32);   // jarak baris normal
+            slipTail().forEach(x => out.push(x));
+            return new Uint8Array(out);
+        }
+        /* Pembuat QR Code (c) 2009 Kazuhiko Arase, lisensi MIT, http://www.d-project.com/ -
+           disisipkan langsung agar cetak struk tidak bergantung pada pustaka CDN. */
+        const QRGEN=(function(){var d={},D={};function _(E){if(E=E.replace("./",""),D[E])return D[E].exports;var T=D[E]={exports:{}};return d[E](T,T.exports,_),T.exports}return d.QR8bitByte=function(E,T,B){var f=B("./QRMode");function o(s){this.mode=f.MODE_8BIT_BYTE,this.data=s}o.prototype={getLength:function(){return this.data.length},write:function(s){for(var v=0;v<this.data.length;v++)s.put(this.data.charCodeAt(v),8)}},E.exports=o},d.QRMode=function(E,T,B){E.exports={MODE_NUMBER:1,MODE_ALPHA_NUM:2,MODE_8BIT_BYTE:4,MODE_KANJI:8}},d.QRErrorCorrectLevel=function(E,T,B){E.exports={L:1,M:0,Q:3,H:2}},d.QRMaskPattern=function(E,T,B){E.exports={PATTERN000:0,PATTERN001:1,PATTERN010:2,PATTERN011:3,PATTERN100:4,PATTERN101:5,PATTERN110:6,PATTERN111:7}},d.QRMath=function(E,T,B){for(var f={glog:function(s){if(s<1)throw new Error("glog("+s+")");return f.LOG_TABLE[s]},gexp:function(s){for(;s<0;)s+=255;for(;s>=256;)s-=255;return f.EXP_TABLE[s]},EXP_TABLE:new Array(256),LOG_TABLE:new Array(256)},o=0;o<8;o++)f.EXP_TABLE[o]=1<<o;for(var o=8;o<256;o++)f.EXP_TABLE[o]=f.EXP_TABLE[o-4]^f.EXP_TABLE[o-5]^f.EXP_TABLE[o-6]^f.EXP_TABLE[o-8];for(var o=0;o<255;o++)f.LOG_TABLE[f.EXP_TABLE[o]]=o;E.exports=f},d.QRBitBuffer=function(E,T,B){function f(){this.buffer=[],this.length=0}f.prototype={get:function(o){var s=Math.floor(o/8);return(this.buffer[s]>>>7-o%8&1)==1},put:function(o,s){for(var v=0;v<s;v++)this.putBit((o>>>s-v-1&1)==1)},getLengthInBits:function(){return this.length},putBit:function(o){var s=Math.floor(this.length/8);this.buffer.length<=s&&this.buffer.push(0),o&&(this.buffer[s]|=128>>>this.length%8),this.length++}},E.exports=f},d.QRPolynomial=function(E,T,B){var f=B("./QRMath");function o(s,v){if(s.length===void 0)throw new Error(s.length+"/"+v);for(var l=0;l<s.length&&s[l]===0;)l++;this.num=new Array(s.length-l+v);for(var i=0;i<s.length-l;i++)this.num[i]=s[i+l]}o.prototype={get:function(s){return this.num[s]},getLength:function(){return this.num.length},multiply:function(s){for(var v=new Array(this.getLength()+s.getLength()-1),l=0;l<this.getLength();l++)for(var i=0;i<s.getLength();i++)v[l+i]^=f.gexp(f.glog(this.get(l))+f.glog(s.get(i)));return new o(v,0)},mod:function(s){if(this.getLength()-s.getLength()<0)return this;for(var v=f.glog(this.get(0))-f.glog(s.get(0)),l=new Array(this.getLength()),i=0;i<this.getLength();i++)l[i]=this.get(i);for(var t=0;t<s.getLength();t++)l[t]^=f.gexp(f.glog(s.get(t))+v);return new o(l,0).mod(s)}},E.exports=o},d.QRUtil=function(E,T,B){var f=B("./QRMode"),o=B("./QRPolynomial"),s=B("./QRMath"),v=B("./QRMaskPattern"),l={PATTERN_POSITION_TABLE:[[],[6,18],[6,22],[6,26],[6,30],[6,34],[6,22,38],[6,24,42],[6,26,46],[6,28,50],[6,30,54],[6,32,58],[6,34,62],[6,26,46,66],[6,26,48,70],[6,26,50,74],[6,30,54,78],[6,30,56,82],[6,30,58,86],[6,34,62,90],[6,28,50,72,94],[6,26,50,74,98],[6,30,54,78,102],[6,28,54,80,106],[6,32,58,84,110],[6,30,58,86,114],[6,34,62,90,118],[6,26,50,74,98,122],[6,30,54,78,102,126],[6,26,52,78,104,130],[6,30,56,82,108,134],[6,34,60,86,112,138],[6,30,58,86,114,142],[6,34,62,90,118,146],[6,30,54,78,102,126,150],[6,24,50,76,102,128,154],[6,28,54,80,106,132,158],[6,32,58,84,110,136,162],[6,26,54,82,110,138,166],[6,30,58,86,114,142,170]],G15:1335,G18:7973,G15_MASK:21522,getBCHTypeInfo:function(i){for(var t=i<<10;l.getBCHDigit(t)-l.getBCHDigit(l.G15)>=0;)t^=l.G15<<l.getBCHDigit(t)-l.getBCHDigit(l.G15);return(i<<10|t)^l.G15_MASK},getBCHTypeNumber:function(i){for(var t=i<<12;l.getBCHDigit(t)-l.getBCHDigit(l.G18)>=0;)t^=l.G18<<l.getBCHDigit(t)-l.getBCHDigit(l.G18);return i<<12|t},getBCHDigit:function(i){for(var t=0;i!==0;)t++,i>>>=1;return t},getPatternPosition:function(i){return l.PATTERN_POSITION_TABLE[i-1]},getMask:function(i,t,n){switch(i){case v.PATTERN000:return(t+n)%2===0;case v.PATTERN001:return t%2===0;case v.PATTERN010:return n%3===0;case v.PATTERN011:return(t+n)%3===0;case v.PATTERN100:return(Math.floor(t/2)+Math.floor(n/3))%2===0;case v.PATTERN101:return t*n%2+t*n%3===0;case v.PATTERN110:return(t*n%2+t*n%3)%2===0;case v.PATTERN111:return(t*n%3+(t+n)%2)%2===0;default:throw new Error("bad maskPattern:"+i)}},getErrorCorrectPolynomial:function(i){for(var t=new o([1],0),n=0;n<i;n++)t=t.multiply(new o([1,s.gexp(n)],0));return t},getLengthInBits:function(i,t){if(1<=t&&t<10)switch(i){case f.MODE_NUMBER:return 10;case f.MODE_ALPHA_NUM:return 9;case f.MODE_8BIT_BYTE:return 8;case f.MODE_KANJI:return 8;default:throw new Error("mode:"+i)}else if(t<27)switch(i){case f.MODE_NUMBER:return 12;case f.MODE_ALPHA_NUM:return 11;case f.MODE_8BIT_BYTE:return 16;case f.MODE_KANJI:return 10;default:throw new Error("mode:"+i)}else if(t<41)switch(i){case f.MODE_NUMBER:return 14;case f.MODE_ALPHA_NUM:return 13;case f.MODE_8BIT_BYTE:return 16;case f.MODE_KANJI:return 12;default:throw new Error("mode:"+i)}else throw new Error("type:"+t)},getLostPoint:function(i){var t=i.getModuleCount(),n=0,r=0,e=0;for(r=0;r<t;r++)for(e=0;e<t;e++){for(var a=0,h=i.isDark(r,e),u=-1;u<=1;u++)if(!(r+u<0||t<=r+u))for(var g=-1;g<=1;g++)e+g<0||t<=e+g||u===0&&g===0||h===i.isDark(r+u,e+g)&&a++;a>5&&(n+=3+a-5)}for(r=0;r<t-1;r++)for(e=0;e<t-1;e++){var m=0;i.isDark(r,e)&&m++,i.isDark(r+1,e)&&m++,i.isDark(r,e+1)&&m++,i.isDark(r+1,e+1)&&m++,(m===0||m===4)&&(n+=3)}for(r=0;r<t;r++)for(e=0;e<t-6;e++)i.isDark(r,e)&&!i.isDark(r,e+1)&&i.isDark(r,e+2)&&i.isDark(r,e+3)&&i.isDark(r,e+4)&&!i.isDark(r,e+5)&&i.isDark(r,e+6)&&(n+=40);for(e=0;e<t;e++)for(r=0;r<t-6;r++)i.isDark(r,e)&&!i.isDark(r+1,e)&&i.isDark(r+2,e)&&i.isDark(r+3,e)&&i.isDark(r+4,e)&&!i.isDark(r+5,e)&&i.isDark(r+6,e)&&(n+=40);var p=0;for(e=0;e<t;e++)for(r=0;r<t;r++)i.isDark(r,e)&&p++;var R=Math.abs(100*p/t/t-50)/5;return n+=R*10,n}};E.exports=l},d.QRRSBlock=function(E,T,B){var f=B("./QRErrorCorrectLevel");function o(s,v){this.totalCount=s,this.dataCount=v}o.RS_BLOCK_TABLE=[[1,26,19],[1,26,16],[1,26,13],[1,26,9],[1,44,34],[1,44,28],[1,44,22],[1,44,16],[1,70,55],[1,70,44],[2,35,17],[2,35,13],[1,100,80],[2,50,32],[2,50,24],[4,25,9],[1,134,108],[2,67,43],[2,33,15,2,34,16],[2,33,11,2,34,12],[2,86,68],[4,43,27],[4,43,19],[4,43,15],[2,98,78],[4,49,31],[2,32,14,4,33,15],[4,39,13,1,40,14],[2,121,97],[2,60,38,2,61,39],[4,40,18,2,41,19],[4,40,14,2,41,15],[2,146,116],[3,58,36,2,59,37],[4,36,16,4,37,17],[4,36,12,4,37,13],[2,86,68,2,87,69],[4,69,43,1,70,44],[6,43,19,2,44,20],[6,43,15,2,44,16],[4,101,81],[1,80,50,4,81,51],[4,50,22,4,51,23],[3,36,12,8,37,13],[2,116,92,2,117,93],[6,58,36,2,59,37],[4,46,20,6,47,21],[7,42,14,4,43,15],[4,133,107],[8,59,37,1,60,38],[8,44,20,4,45,21],[12,33,11,4,34,12],[3,145,115,1,146,116],[4,64,40,5,65,41],[11,36,16,5,37,17],[11,36,12,5,37,13],[5,109,87,1,110,88],[5,65,41,5,66,42],[5,54,24,7,55,25],[11,36,12],[5,122,98,1,123,99],[7,73,45,3,74,46],[15,43,19,2,44,20],[3,45,15,13,46,16],[1,135,107,5,136,108],[10,74,46,1,75,47],[1,50,22,15,51,23],[2,42,14,17,43,15],[5,150,120,1,151,121],[9,69,43,4,70,44],[17,50,22,1,51,23],[2,42,14,19,43,15],[3,141,113,4,142,114],[3,70,44,11,71,45],[17,47,21,4,48,22],[9,39,13,16,40,14],[3,135,107,5,136,108],[3,67,41,13,68,42],[15,54,24,5,55,25],[15,43,15,10,44,16],[4,144,116,4,145,117],[17,68,42],[17,50,22,6,51,23],[19,46,16,6,47,17],[2,139,111,7,140,112],[17,74,46],[7,54,24,16,55,25],[34,37,13],[4,151,121,5,152,122],[4,75,47,14,76,48],[11,54,24,14,55,25],[16,45,15,14,46,16],[6,147,117,4,148,118],[6,73,45,14,74,46],[11,54,24,16,55,25],[30,46,16,2,47,17],[8,132,106,4,133,107],[8,75,47,13,76,48],[7,54,24,22,55,25],[22,45,15,13,46,16],[10,142,114,2,143,115],[19,74,46,4,75,47],[28,50,22,6,51,23],[33,46,16,4,47,17],[8,152,122,4,153,123],[22,73,45,3,74,46],[8,53,23,26,54,24],[12,45,15,28,46,16],[3,147,117,10,148,118],[3,73,45,23,74,46],[4,54,24,31,55,25],[11,45,15,31,46,16],[7,146,116,7,147,117],[21,73,45,7,74,46],[1,53,23,37,54,24],[19,45,15,26,46,16],[5,145,115,10,146,116],[19,75,47,10,76,48],[15,54,24,25,55,25],[23,45,15,25,46,16],[13,145,115,3,146,116],[2,74,46,29,75,47],[42,54,24,1,55,25],[23,45,15,28,46,16],[17,145,115],[10,74,46,23,75,47],[10,54,24,35,55,25],[19,45,15,35,46,16],[17,145,115,1,146,116],[14,74,46,21,75,47],[29,54,24,19,55,25],[11,45,15,46,46,16],[13,145,115,6,146,116],[14,74,46,23,75,47],[44,54,24,7,55,25],[59,46,16,1,47,17],[12,151,121,7,152,122],[12,75,47,26,76,48],[39,54,24,14,55,25],[22,45,15,41,46,16],[6,151,121,14,152,122],[6,75,47,34,76,48],[46,54,24,10,55,25],[2,45,15,64,46,16],[17,152,122,4,153,123],[29,74,46,14,75,47],[49,54,24,10,55,25],[24,45,15,46,46,16],[4,152,122,18,153,123],[13,74,46,32,75,47],[48,54,24,14,55,25],[42,45,15,32,46,16],[20,147,117,4,148,118],[40,75,47,7,76,48],[43,54,24,22,55,25],[10,45,15,67,46,16],[19,148,118,6,149,119],[18,75,47,31,76,48],[34,54,24,34,55,25],[20,45,15,61,46,16]],o.getRSBlocks=function(s,v){var l=o.getRsBlockTable(s,v);if(l===void 0)throw new Error("bad rs block @ typeNumber:"+s+"/errorCorrectLevel:"+v);for(var i=l.length/3,t=[],n=0;n<i;n++)for(var r=l[n*3+0],e=l[n*3+1],a=l[n*3+2],h=0;h<r;h++)t.push(new o(e,a));return t},o.getRsBlockTable=function(s,v){switch(v){case f.L:return o.RS_BLOCK_TABLE[(s-1)*4+0];case f.M:return o.RS_BLOCK_TABLE[(s-1)*4+1];case f.Q:return o.RS_BLOCK_TABLE[(s-1)*4+2];case f.H:return o.RS_BLOCK_TABLE[(s-1)*4+3];default:return}},E.exports=o},d.index=function(E,T,B){var f=B("./QR8bitByte"),o=B("./QRUtil"),s=B("./QRPolynomial"),v=B("./QRRSBlock"),l=B("./QRBitBuffer");function i(t,n){this.typeNumber=t,this.errorCorrectLevel=n,this.modules=null,this.moduleCount=0,this.dataCache=null,this.dataList=[]}i.prototype={addData:function(t){var n=new f(t);this.dataList.push(n),this.dataCache=null},isDark:function(t,n){if(t<0||this.moduleCount<=t||n<0||this.moduleCount<=n)throw new Error(t+","+n);return this.modules[t][n]},getModuleCount:function(){return this.moduleCount},make:function(){if(this.typeNumber<1){var t=1;for(t=1;t<40;t++){for(var n=v.getRSBlocks(t,this.errorCorrectLevel),r=new l,e=0,a=0;a<n.length;a++)e+=n[a].dataCount;for(var h=0;h<this.dataList.length;h++){var u=this.dataList[h];r.put(u.mode,4),r.put(u.getLength(),o.getLengthInBits(u.mode,t)),u.write(r)}if(r.getLengthInBits()<=e*8)break}this.typeNumber=t}this.makeImpl(!1,this.getBestMaskPattern())},makeImpl:function(t,n){this.moduleCount=this.typeNumber*4+17,this.modules=new Array(this.moduleCount);for(var r=0;r<this.moduleCount;r++){this.modules[r]=new Array(this.moduleCount);for(var e=0;e<this.moduleCount;e++)this.modules[r][e]=null}this.setupPositionProbePattern(0,0),this.setupPositionProbePattern(this.moduleCount-7,0),this.setupPositionProbePattern(0,this.moduleCount-7),this.setupPositionAdjustPattern(),this.setupTimingPattern(),this.setupTypeInfo(t,n),this.typeNumber>=7&&this.setupTypeNumber(t),this.dataCache===null&&(this.dataCache=i.createData(this.typeNumber,this.errorCorrectLevel,this.dataList)),this.mapData(this.dataCache,n)},setupPositionProbePattern:function(t,n){for(var r=-1;r<=7;r++)if(!(t+r<=-1||this.moduleCount<=t+r))for(var e=-1;e<=7;e++)n+e<=-1||this.moduleCount<=n+e||(0<=r&&r<=6&&(e===0||e===6)||0<=e&&e<=6&&(r===0||r===6)||2<=r&&r<=4&&2<=e&&e<=4?this.modules[t+r][n+e]=!0:this.modules[t+r][n+e]=!1)},getBestMaskPattern:function(){for(var t=0,n=0,r=0;r<8;r++){this.makeImpl(!0,r);var e=o.getLostPoint(this);(r===0||t>e)&&(t=e,n=r)}return n},createMovieClip:function(t,n,r){var e=t.createEmptyMovieClip(n,r),a=1;this.make();for(var h=0;h<this.modules.length;h++)for(var u=h*a,g=0;g<this.modules[h].length;g++){var m=g*a,p=this.modules[h][g];p&&(e.beginFill(0,100),e.moveTo(m,u),e.lineTo(m+a,u),e.lineTo(m+a,u+a),e.lineTo(m,u+a),e.endFill())}return e},setupTimingPattern:function(){for(var t=8;t<this.moduleCount-8;t++)this.modules[t][6]===null&&(this.modules[t][6]=t%2===0);for(var n=8;n<this.moduleCount-8;n++)this.modules[6][n]===null&&(this.modules[6][n]=n%2===0)},setupPositionAdjustPattern:function(){for(var t=o.getPatternPosition(this.typeNumber),n=0;n<t.length;n++)for(var r=0;r<t.length;r++){var e=t[n],a=t[r];if(this.modules[e][a]===null)for(var h=-2;h<=2;h++)for(var u=-2;u<=2;u++)Math.abs(h)===2||Math.abs(u)===2||h===0&&u===0?this.modules[e+h][a+u]=!0:this.modules[e+h][a+u]=!1}},setupTypeNumber:function(t){for(var n=o.getBCHTypeNumber(this.typeNumber),r,e=0;e<18;e++)r=!t&&(n>>e&1)===1,this.modules[Math.floor(e/3)][e%3+this.moduleCount-8-3]=r;for(var a=0;a<18;a++)r=!t&&(n>>a&1)===1,this.modules[a%3+this.moduleCount-8-3][Math.floor(a/3)]=r},setupTypeInfo:function(t,n){for(var r=this.errorCorrectLevel<<3|n,e=o.getBCHTypeInfo(r),a,h=0;h<15;h++)a=!t&&(e>>h&1)===1,h<6?this.modules[h][8]=a:h<8?this.modules[h+1][8]=a:this.modules[this.moduleCount-15+h][8]=a;for(var u=0;u<15;u++)a=!t&&(e>>u&1)===1,u<8?this.modules[8][this.moduleCount-u-1]=a:u<9?this.modules[8][15-u-1+1]=a:this.modules[8][15-u-1]=a;this.modules[this.moduleCount-8][8]=!t},mapData:function(t,n){for(var r=-1,e=this.moduleCount-1,a=7,h=0,u=this.moduleCount-1;u>0;u-=2)for(u===6&&u--;;){for(var g=0;g<2;g++)if(this.modules[e][u-g]===null){var m=!1;h<t.length&&(m=(t[h]>>>a&1)===1);var p=o.getMask(n,e,u-g);p&&(m=!m),this.modules[e][u-g]=m,a--,a===-1&&(h++,a=7)}if(e+=r,e<0||this.moduleCount<=e){e-=r,r=-r;break}}}},i.PAD0=236,i.PAD1=17,i.createData=function(t,n,r){for(var e=v.getRSBlocks(t,n),a=new l,h=0;h<r.length;h++){var u=r[h];a.put(u.mode,4),a.put(u.getLength(),o.getLengthInBits(u.mode,t)),u.write(a)}for(var g=0,m=0;m<e.length;m++)g+=e[m].dataCount;if(a.getLengthInBits()>g*8)throw new Error("code length overflow. ("+a.getLengthInBits()+">"+g*8+")");for(a.getLengthInBits()+4<=g*8&&a.put(0,4);a.getLengthInBits()%8!==0;)a.putBit(!1);for(;!(a.getLengthInBits()>=g*8||(a.put(i.PAD0,8),a.getLengthInBits()>=g*8));)a.put(i.PAD1,8);return i.createBytes(a,e)},i.createBytes=function(t,n){for(var r=0,e=0,a=0,h=new Array(n.length),u=new Array(n.length),g=0;g<n.length;g++){var m=n[g].dataCount,p=n[g].totalCount-m;e=Math.max(e,m),a=Math.max(a,p),h[g]=new Array(m);for(var R=0;R<h[g].length;R++)h[g][R]=255&t.buffer[R+r];r+=m;var C=o.getErrorCorrectPolynomial(p),y=new s(h[g],C.getLength()-1),k=y.mod(C);u[g]=new Array(C.getLength()-1);for(var L=0;L<u[g].length;L++){var N=L+k.getLength()-u[g].length;u[g][L]=N>=0?k.get(N):0}}for(var b=0,w=0;w<n.length;w++)b+=n[w].totalCount;for(var Q=new Array(b),I=0,P=0;P<e;P++)for(var c=0;c<n.length;c++)P<h[c].length&&(Q[I++]=h[c][P]);for(var A=0;A<a;A++)for(var M=0;M<n.length;M++)A<u[M].length&&(Q[I++]=u[M][A]);return Q},E.exports=i},{QR:_("index"),EC:_("QRErrorCorrectLevel")}})();
+        function qrMatrix(text) {
+            for (let t = 1; t <= 40; t++) {
+                try { const q = new QRGEN.QR(t, QRGEN.EC.M); q.addData(text); q.make(); return q; } catch (e) {}
+            }
+            return null;
+        }
+        let lastCetakError = '';
+        /* Pemotong kertas: printer 58 mm umumnya TIDAK punya pemotong; tanpa pemotong kertas hanya didorong keluar agar bisa disobek */
+        function punyaPemotong() {
+            let v = '';
+            try { v = localStorage.getItem('potongStruk') || ''; } catch (e) {}
+            if (!v) v = String(appSet.Potong_Struk || 'ya').trim().toLowerCase();
+            return v !== 'tidak';
+        }
+        function setPotong(ya) { try { localStorage.setItem('potongStruk', ya ? 'ya' : 'tidak'); } catch (e) { appSet.Potong_Struk = ya ? 'ya' : 'tidak'; } }
+        function slipTail() { return punyaPemotong() ? [0x1B, 0x64, 4, 0x1D, 0x56, 0x01] : [0x1B, 0x64, 7]; }
         /* Gambar struk (judul tebal, QR, kode) ke canvas lalu jadikan bitmap. Lebar 384 dot = kertas 58 mm.
            Mengembalikan null bila QR tidak bisa dibuat -> pemanggil memakai struk teks. */
-        function renderSlipRaster(o) {
-            if (!o.kode || typeof QRCode === 'undefined') return null;
+        function renderSlipRaster(o, fmt) {
+            if (!o.kode) { lastCetakError = 'kode struk kosong'; return null; }
             const W = (parseInt(appSet.Lebar_Struk_Dot, 10) || 384) & ~7;
-            const holder = document.createElement('div');
-            holder.style.cssText = 'position:fixed;left:-9999px;top:0';
-            document.body.appendChild(holder);
-            let qrCanvas = null;
-            try {
-                const lvl = (QRCode.CorrectLevel || {}).M;
-                new QRCode(holder, Object.assign({ text: o.qr, width: 264, height: 264 }, lvl !== undefined ? { correctLevel: lvl } : {}));
-                qrCanvas = holder.querySelector('canvas');
-            } catch (e) { console.error(e); }
-            if (!qrCanvas) { holder.remove(); return null; }
+            const qr = qrMatrix(o.qr);
+            if (!qr) { lastCetakError = 'QR gagal dibuat (isi terlalu panjang)'; return null; }
+            const mc = qr.getModuleCount(), cell = Math.max(3, Math.floor((W - 16) / mc)), qs = cell * mc;   // tiap modul kelipatan bulat dot agar tajam
 
             const cv = document.createElement('canvas');
-            cv.width = W; cv.height = 700;
+            cv.width = W; cv.height = 780;
             const ctx = cv.getContext('2d', { willReadFrequently: true });
             ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, W, cv.height);
             ctx.fillStyle = '#000'; ctx.textAlign = 'center'; ctx.textBaseline = 'top';
@@ -874,16 +945,17 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             line(toAscii(o.waktu), 20, 'normal', null, 4);
             dash();
             ctx.imageSmoothingEnabled = false;
-            ctx.drawImage(qrCanvas, Math.floor((W - qrCanvas.width) / 2), y);
-            y += qrCanvas.height + 8;
+            ctx.fillStyle = '#000';
+            const qx = Math.floor((W - qs) / 2);
+            for (let r = 0; r < mc; r++) for (let c2 = 0; c2 < mc; c2++) if (qr.isDark(r, c2)) ctx.fillRect(qx + c2 * cell, y + r * cell, cell, cell);
+            y += qs + 8;
             line(toAscii(o.kode).split('').join(' '), 26, 'bold', "'Courier New', Courier, monospace", 6);
             dash();
             line('Masukkan ke kotak audit.', 20, 'normal', null, 2);
             line('Jangan dibawa pulang.', 20, 'normal', null, 4);
             const H = Math.ceil((y + 6) / 8) * 8;
             const data = ctx.getImageData(0, 0, W, H).data;
-            holder.remove();
-            return packRaster(data, W, H);
+            return fmt === 'esc' ? packEscStar(data, W, H) : packRaster(data, W, H);
         }
         function sendToRawBT(bytes) {
             try {
@@ -898,8 +970,8 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
                 return false;
             }
         }
-        function printVoteSlip(c, done, kode, tps, voteTime, struk) {
-            if (!useRawBT()) return printVoteSlipBrowser(c, done, kode, tps, voteTime, struk);
+        function printVoteSlip(c, done, kode, tps, voteTime, struk, forceMode) {
+            if (!forceMode && !useRawBT()) return printVoteSlipBrowser(c, done, kode, tps, voteTime, struk);
 
             const test = !c;
             const desa = (appSet.Nama_Desa || 'Salamjaya').toUpperCase();
@@ -916,14 +988,22 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
                 qr: kode ? JSON.stringify({ kode, desa, tps: tpsNo, waktu }) : ''
             };
             if (struk) { slip.kode = struk.kode; slip.desa = struk.desa; slip.tps = struk.tps; slip.waktu = struk.waktu; slip.qr = JSON.stringify(struk); }   // data bertanda tangan dari server
-            // Mode_Struk: "gambar" (standar, dengan QR) atau "teks" (teks biasa tanpa QR, seperti versi awal)
-            const modeStruk = String(appSet.Mode_Struk || '').trim().toLowerCase();
+            if (test) slip.qr = JSON.stringify({ kode: slip.kode, desa, tps: tpsNo, waktu, pilihan: '1', sig: 'T'.repeat(86) });   // contoh sepanjang struk asli
+            // Mode cetak: dari Menu > Tes Cetak Struk (per tablet) atau pengaturan Mode_Struk
+            const modeStruk = forceMode || getModeStruk();
             slip.noQr = modeStruk === 'teks';
             let bytes = null;
-            if (modeStruk !== 'teks') {
-                try { bytes = renderSlipRaster(slip); } catch (e) { console.error('Raster struk gagal:', e); }
+            if (modeStruk === 'gambar' || modeStruk === 'gambar2') {
+                try { bytes = renderSlipRaster(slip, modeStruk === 'gambar2' ? 'esc' : 'gs'); } catch (e) { console.error('Raster struk gagal:', e); }
             }
-            if (!bytes) bytes = buildSlipBytes(slip);   // cadangan: struk teks + QR bawaan printer
+            if (!bytes) {
+                if (modeStruk !== 'qr' && modeStruk !== 'teks') {
+                    // Gambar QR gagal: JANGAN kirim perintah QR bawaan (printer yang tidak mengenalnya mencetak isi QR sebagai teks). Cetak kode saja.
+                    slip.noQr = true;
+                    alert('QR struk gagal dibuat (' + (lastCetakError || 'sebab tidak diketahui') + '). Struk dicetak tanpa QR; catat kode struk dan beri tahu panitia.');
+                }
+                bytes = buildSlipBytes(slip);
+            }
 
             const ok2 = sendToRawBT(bytes);
             if (!ok2) alert('Gagal mengirim struk ke RawBT. Pastikan aplikasi RawBT terpasang.');
@@ -1541,7 +1621,6 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             if (errorBox) {
                 errorBox.textContent = msg;
                 errorBox.classList.remove('hidden');
-                try { errorBox.scrollIntoView({ block: 'nearest' }); } catch (e) {}
             } else {
                 alert(msg);
             }
@@ -1586,14 +1665,8 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             set('sb-l3', S('Kabupaten') ? 'KABUPATEN ' + S('Kabupaten') : '');
             set('sb-l4', 'TAHUN ' + (S('Tahun') || new Date().getFullYear()));
             const lg = document.getElementById('sb-logos');
-            /* Link Google Drive (file/d/ID/view, open?id=, uc?id=) bukan gambar langsung, jadi diubah ke alamat thumbnail agar tampil */
-            const logoSrc = u => {
-                if (/^data:image\//i.test(u)) return { src: u, alt: '' };
-                const m = /(drive|docs)\.google\.com|googleusercontent\.com/i.test(u) ? u.match(/[-\w]{25,}/) : null;
-                return m ? { src: 'https://drive.google.com/thumbnail?id=' + m[0] + '&sz=w400', alt: 'https://lh3.googleusercontent.com/d/' + m[0] + '=w400' } : { src: u, alt: '' };
-            };
             lg.innerHTML = [appSet.Logo_Kiri, appSet.Logo_Kanan].map(u => String(u || '').trim()).filter(u => /^(https?:\/\/|data:image\/)/i.test(u))
-                .map(u => { const l = logoSrc(u); return `<img src="${esc(l.src)}" alt="" referrerpolicy="no-referrer" data-alt="${esc(l.alt)}" onerror="if(this.dataset.alt){this.src=this.dataset.alt;this.dataset.alt='';}else{this.style.display='none';}">`; }).join('');
+                .map(u => `<img src="${esc(u)}" alt="" onerror="this.style.display='none'">`).join('');
             document.getElementById('sb-head').classList.toggle('nologo', !lg.children.length);
             
             // Perbaikan render kartu calon agar responsif disentuh/diklik
@@ -1650,10 +1723,11 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
         function fitConfirmCard() {
             const m = document.getElementById('modal-confirm-vote'), card = document.getElementById('cf-card');
             if (!m || !card || m.classList.contains('hidden')) return;
+            const land = window.innerWidth > window.innerHeight;
             const sel = selectedCandidateForVote && Array.from(document.querySelectorAll('#sb-inner .sb-card')).find(el => el.dataset.id === selectedCandidateForVote.id);
             let w = sel ? sel.getBoundingClientRect().width : 200;
-            const maxH = window.innerHeight * 0.48;   // sisakan ruang untuk ikon, judul, dan tombol
-            const maxW = window.innerWidth * 0.80;
+            const maxH = window.innerHeight * (land ? 0.80 : 0.46);
+            const maxW = window.innerWidth * (land ? 0.38 : 0.80);
             if (w * 1.75 > maxH) w = maxH / 1.75;
             w = Math.max(110, Math.min(w, maxW));
             card.style.setProperty('--cfw', Math.floor(w) + 'px');
