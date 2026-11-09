@@ -744,10 +744,10 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             document.getElementById('print-area').innerHTML = `
                 <style>#slip-qr img,#slip-qr canvas{width:100%!important;height:100%!important}</style>
                 <div style="width:48mm;margin:0 auto;text-align:center;font-family:Arial,sans-serif;color:#000;padding:2mm 0">
-                    ${test ? '<div style="font-weight:bold;font-size:12px">*** CONTOH / TIDAK SAH ***</div>' : ''}
+                    ${test ? '<div style="font-weight:font-size:12px">*** CONTOH / TIDAK SAH ***</div>' : ''}
                     <div style="font-weight:bold;font-size:13px">SALINAN SUARA SAH</div>
                     <div style="font-size:11px">PILKADES DESA ${esc(desa)}</div>
-                    <div style="font-size:10px;font-weight:bold;margin-top:1mm">TPS: ${esc(tpsNo)}</div>
+                    <div style="font-size:10px;font-weight:margin-top:1mm">TPS ${esc(tpsNo)}</div>
                     <div style="font-size:9px;margin-bottom:1mm">${esc(timeStr)}</div>
                     <div style="border-top:1px dashed #000;margin:2mm 0"></div>
                     ${ok ? `<div id="slip-qr" style="width:34mm;height:34mm;margin:0 auto"></div>
