@@ -790,12 +790,11 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             const bold = n => raw(0x1B, 0x45, n);
             const LINE = '--------------------------------\n'; // 32 kolom = kertas 58 mm
             raw(0x1B, 0x40);                          // reset printer
-            align(1); bold(1);
+            align(1); 
             if (o.test) txt('*** CONTOH / TIDAK SAH ***\n');
             txt('SALINAN SUARA SAH\n');
             txt('PILKADES DESA ' + o.desa + '\n');
             txt('TPS : ' + o.tps + '\n');
-            bold(0);
             txt(o.waktu + '\n');
             align(0); txt(LINE); align(1);
             if (o.kode && o.noQr) {
