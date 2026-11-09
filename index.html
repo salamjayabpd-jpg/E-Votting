@@ -354,6 +354,15 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
 #modal-confirm-vote .cf2-btn { flex: 1; min-height: max(56px, 7.5vh); border: 0; border-radius: 999px; color: #fff; font-weight: 800; font-size: clamp(18px, 3.2vh, 28px); cursor: pointer; font-family: inherit; }
 #modal-confirm-vote .cf2-ulang { background: #dc2626; }
 #modal-confirm-vote .cf2-pilih { background: #2563eb; }
+#modal-confirm-vote .cf2-pilih:disabled { opacity: .6; cursor: default; }
+/* ===== Layar proses saat suara dikirim (redup + roda putar) ===== */
+#vote-loading { position: fixed; inset: 0; z-index: 70; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; padding: 24px; text-align: center; background: rgba(15,23,42,.82); backdrop-filter: blur(3px); -webkit-backdrop-filter: blur(3px); color: #fff; font-family: 'Plus Jakarta Sans', system-ui, sans-serif; }
+#vote-loading.hidden { display: none !important; }
+#vote-loading .vl-spin { width: clamp(56px, 9vh, 88px); height: clamp(56px, 9vh, 88px); border: 6px solid rgba(255,255,255,.25); border-top-color: #fff; border-radius: 50%; animation: vlspin .9s linear infinite; }
+#vote-loading .vl-t { font-size: clamp(20px, 3.6vh, 32px); font-weight: 800; }
+#vote-loading .vl-s { font-size: clamp(13px, 2.2vh, 18px); opacity: .85; }
+@keyframes vlspin { to { transform: rotate(360deg); } }
+
 </style>
 </head>
 <body class="kiosk-voter h-full bg-slate-900 text-slate-100 antialiased flex flex-col justify-between selection:bg-blue-500 selection:text-white">
@@ -572,6 +581,11 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
     <button id="kiosk-gear" type="button" onclick="toggleKioskMenu()" title="Menu panitia" class="hidden fixed bottom-4 left-4 z-40 w-11 h-11 rounded-full bg-slate-800/90 border border-slate-600 text-slate-200 flex items-center justify-center shadow-lg"><i class="fa-solid fa-gear"></i></button>
     <div id="kiosk-menu" class="hidden fixed bottom-20 left-4 z-50 flex flex-col gap-1 p-2 rounded-2xl bg-slate-800 border border-slate-600 shadow-2xl"><div id="kiosk-empty" class="hidden text-xs text-slate-400 px-3 py-2">Tidak ada menu</div><button type="button" class="kiosk-item" onclick="openTesCetak()">Tes Cetak Struk</button></div>
     <button id="btn-fs" onclick="goFullscreen()" title="Layar penuh" class="hidden fixed bottom-4 right-4 z-40 w-11 h-11 rounded-full bg-slate-800/90 border border-slate-600 text-slate-200 hover:bg-slate-700 flex items-center justify-center shadow-lg"><i class="fa-solid fa-expand"></i></button>
+    <div id="vote-loading" class="hidden" role="status" aria-live="polite">
+        <div class="vl-spin"></div>
+        <div class="vl-t">Menyimpan suara Anda...</div>
+        <div class="vl-s">Mohon tunggu, jangan tekan tombol apa pun.</div>
+    </div>
     <div id="modal-thanks" class="fixed inset-0 z-[60] hidden bg-slate-950/90 backdrop-blur-md flex items-center justify-center p-4">
         <div class="glass-panel max-w-md w-full p-8 rounded-3xl text-center space-y-3 border border-slate-700">
             <div id="thanks-icon" class="text-emerald-400"><i class="fa-solid fa-circle-check text-6xl"></i></div>
@@ -1771,9 +1785,26 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             updatePilihPill();
         }
 
+        let voteSlowTimer = null;
+        const VOTE_SLOW_MS = 30000;   // setelah 30 detik tulisan berganti (roda tetap berputar, pengiriman tidak dibatalkan)
+        function setVoteLoading(on) {   // redupkan layar + roda putar selama suara dikirim ke server
+            clearTimeout(voteSlowTimer);
+            const vt = document.querySelector('#vote-loading .vl-t'), vs = document.querySelector('#vote-loading .vl-s');
+            if (vt) vt.textContent = 'Menyimpan suara Anda...';
+            if (vs) vs.textContent = 'Mohon tunggu, jangan tekan tombol apa pun.';
+            if (on) voteSlowTimer = setTimeout(() => {
+                if (vt) vt.textContent = 'Koneksi lambat, suara masih diproses';
+                if (vs) vs.textContent = 'Jangan tekan apa pun. Jika lebih dari 1 menit, panggil panitia.';
+            }, VOTE_SLOW_MS);
+            const o = document.getElementById('vote-loading'); if (o) o.classList.toggle('hidden', !on);
+            const b = document.querySelector('#modal-confirm-vote .cf2-pilih'); if (b) b.disabled = !!on;
+            const l = document.getElementById('confirm-btn-label'); if (l) l.textContent = on ? 'Memproses...' : 'Pilih';
+        }
+
         function submitVote() {
             if (voting || !voterToken || !selectedCandidateForVote) return;
             voting = true;
+            setVoteLoading(true);
             const cand = selectedCandidateForVote, nama = loggedInVoter ? loggedInVoter.nama : '';
             
             // Ambil nomor TPS pemilih dan stempel waktu presisi saat tombol diklik
@@ -1781,6 +1812,7 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             const voteTime = new Date(); 
 
             gs('submitElectorateVote', voterToken, cand.id).then(res => {
+                setVoteLoading(false);
                 triggerConfetti(); playSuccessSound();
                 closeConfirmVoteModal();
                 loggedInVoter = null; voterToken = null;
@@ -1805,6 +1837,7 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
                 } else showThanks();
                 if (adminToken) loadPublicData(true);
             }).catch(err => {
+                setVoteLoading(false);
                 closeConfirmVoteModal();
                 const msg = errMsg(err);
                 if (msg.includes('SESI_HABIS')) {
