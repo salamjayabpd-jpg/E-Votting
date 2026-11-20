@@ -855,6 +855,78 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             slipTail().forEach(x => out.push(x));   // dorong kertas + potong bila ada pemotong
             return new Uint8Array(out);
         }
+        /* ===== CETAK OTOMATIS PRINTER TERMAL (Android + RawBT, ESC/POS) =====
+           - Android  -> kirim ESC/POS langsung ke aplikasi RawBT (tanpa dialog print browser)
+           - Selain Android / Mode_Cetak = "browser" -> memakai window.print() seperti sebelumnya */
+        function useRawBT() {
+            const mode = String(appSet.Mode_Cetak || '').trim().toLowerCase();
+            if (mode === 'browser') return false;
+            if (mode === 'rawbt') return true;
+            const uad = navigator.userAgentData;
+            return /Android/i.test(navigator.userAgent) || !!(uad && uad.platform === 'Android');
+        }
+        function toAscii(s) {
+            return String(s == null ? '' : s).normalize('NFD').replace(/[^\x20-\x7E]/g, '');
+        }
+        function buildSlipBytes(o) {
+            const out = [];
+            const raw = (...b) => { for (const x of b) out.push(x); };
+            const txt = s => { new TextEncoder().encode(toAscii(s)).forEach(x => out.push(x)); };
+            const align = n => raw(0x1B, 0x61, n);   // 0 kiri, 1 tengah
+            const bold = n => raw(0x1B, 0x45, n);
+            const LINE = '------------------------------------------------\n'; // 48 kolom = kertas 80 mm
+            raw(0x1B, 0x40);                          // reset printer
+            align(1); 
+            if (o.test) txt('*** CONTOH / TIDAK SAH ***\n');
+            txt('SALINAN SUARA SAH\n');
+            txt('PILKADES DESA ' + o.desa + '\n');
+            txt('TPS : ' + o.tps + '\n');
+            txt(o.waktu + '\n');
+            align(0); txt(LINE); align(1);
+            if (o.kode && o.noQr) {
+                txt('KODE AUDIT / KODE UNIK:\n'); bold(1); txt(o.kode + '\n'); bold(0);
+            } else if (o.kode) {
+                // QR Code native ESC/POS (GS ( k)
+                const data = new TextEncoder().encode(o.qr);
+                const n = data.length + 3;
+                raw(0x1D, 0x28, 0x6B, 0x04, 0x00, 0x31, 0x41, 0x32, 0x00); // model 2
+                raw(0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x43, 7);          // ukuran modul 7
+                raw(0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x45, 0x31);       // koreksi level M
+                raw(0x1D, 0x28, 0x6B, n & 255, n >> 8, 0x31, 0x50, 0x30);  // simpan data
+                data.forEach(x => out.push(x));
+                raw(0x1D, 0x28, 0x6B, 0x03, 0x00, 0x31, 0x51, 0x30);       // cetak QR
+                txt('\n'); bold(1); txt(o.kode + '\n'); bold(0);
+            } else {
+                bold(1); txt('KODE STRUK TIDAK TERSEDIA\nHUBUNGI PANITIA\n'); bold(0);
+            }
+            align(0); txt(LINE); align(1);
+            txt('Masukkan ke kotak audit.\nJangan dibawa pulang.\n');
+            align(0);
+            txt('\n\n\n');
+            slipTail().forEach(x => out.push(x));   // dorong kertas + potong bila ada pemotong
+            return new Uint8Array(out);
+        }
+        /* Konversi piksel canvas -> bitmap ESC/POS (GS v 0), dipecah per 128 baris agar aman di buffer printer */
+        function packRaster(data, W, H) {
+            const wb = W >> 3, out = [0x1B, 0x40, 0x1B, 0x61, 0x00];
+            for (let y0 = 0; y0 < H; y0 += 128) {
+                const h = Math.min(128, H - y0);
+                out.push(0x1D, 0x76, 0x30, 0x00, wb & 255, wb >> 8, h & 255, h >> 8);
+                for (let y = y0; y < y0 + h; y++) {
+                    for (let bx = 0; bx < wb; bx++) {
+                        let b = 0;
+                        for (let k = 0; k < 8; k++) {
+                            const i = (y * W + bx * 8 + k) * 4;
+                            const lum = data[i] * 0.299 + data[i + 1] * 0.587 + data[i + 2] * 0.114;
+                            if (lum < 140) b |= (0x80 >> k);
+                        }
+                        out.push(b);
+                    }
+                }
+            }
+            slipTail().forEach(x => out.push(x));   // dorong kertas + potong bila ada pemotong
+            return new Uint8Array(out);
+        }
         /* ===== MODE CETAK STRUK (dipilih per tablet lewat Menu > Tes Cetak Struk, tersimpan di tablet) =====
            gambar  : QR dicetak sebagai gambar (GS v 0)        - standar
            gambar2 : QR dicetak sebagai gambar (ESC *)         - printer lama yang mencetak "kode aneh" pada mode gambar
@@ -940,7 +1012,7 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
            Mengembalikan null bila QR tidak bisa dibuat -> pemanggil memakai struk teks. */
         function renderSlipRaster(o, fmt) {
             if (!o.kode) { lastCetakError = 'kode struk kosong'; return null; }
-            const W = (parseInt(appSet.Lebar_Struk_Dot, 10) || 384) & ~7;
+            const W = (parseInt(appSet.Lebar_Struk_Dot, 10) || 576) & ~7;
             const qr = qrMatrix(o.qr);
             if (!qr) { lastCetakError = 'QR gagal dibuat (isi terlalu panjang)'; return null; }
             const mc = qr.getModuleCount(), cell = Math.max(3, Math.floor((W - 16) / mc)), qs = cell * mc;   // tiap modul kelipatan bulat dot agar tajam
@@ -999,7 +1071,7 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             if (!forceMode && !useRawBT()) return printVoteSlipBrowser(c, done, kode, tps, voteTime, struk);
 
             const test = !c;
-            const desa = (appSet.Nama_Desa || 'Salamjaya').toUpperCase();
+            const desa = (appSet.Nama_Desa || 'Karanghegar').toUpperCase();
             const tpsNo = tps ? String(tps).trim() : '1';
             const vt = voteTime ? new Date(voteTime) : new Date();
             const waktu = vt.toLocaleString('id-ID', {
@@ -1283,7 +1355,7 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             return new Date().toLocaleString('id-ID', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit', hour12: false });
         }
         function buildRekapText(r) {
-            const out = [], COLS = 32, LINE = '-'.repeat(COLS) + '\n';
+            const out = [], COLS = 48, LINE = '-'.repeat(COLS) + '\n';
             const raw = (...b) => { for (const x of b) out.push(x); };
             const txt = t => { new TextEncoder().encode(toAscii(t)).forEach(x => out.push(x)); };
             const align = n => raw(0x1B, 0x61, n), bold = n => raw(0x1B, 0x45, n);
@@ -1306,7 +1378,7 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
             return new Uint8Array(out);
         }
         function renderRekapRaster(r) {
-            const W = (parseInt(appSet.Lebar_Struk_Dot, 10) || 384) & ~7;
+            const W = (parseInt(appSet.Lebar_Struk_Dot, 10) || 576) & ~7;
             const cv = document.createElement('canvas');
             cv.width = W; cv.height = 820 + 30 * r.suara.length;
             const ctx = cv.getContext('2d', { willReadFrequently: true });
@@ -1356,7 +1428,7 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
         function printRekapBrowser(r) {
             const row = (a, b, bold) => `<tr style="${bold ? 'font-weight:bold;border-top:1px solid #000' : ''}"><td>${a}</td><td style="text-align:right">${b}</td></tr>`;
             document.getElementById('print-area').innerHTML = `
-                <div style="width:48mm;margin:0 auto;font-family:Arial,sans-serif;color:#000;font-size:10px;padding:2mm 0">
+                <div style="width:72mm;margin:0 auto;font-family:Arial,sans-serif;color:#000;font-size:10px;padding:2mm 0">
                     <div style="text-align:center;font-weight:bold;font-size:13px">REKAPITULASI SUARA</div>
                     <div style="text-align:center;font-size:11px">PILKADES DESA ${esc(r.desa)}</div>
                     <div style="text-align:center;font-weight:bold;font-size:12px">TPS: ${esc(r.tps)}</div>
@@ -1373,13 +1445,13 @@ button.sb-pill.off { background: #dc2626; box-shadow: none; cursor: default; }
                     <div style="border-top:1px dashed #000;margin:2mm 0"></div>
                     <div style="text-align:center">Ketua KPPS TPS ${esc(r.tps)},<br><br><br><br>(......................)</div>
                 </div>`;
-            setPage('@page { size: 58mm auto; margin: 0; }');
+            setPage('@page { size: 80mm auto; margin: 0; }');
             setTimeout(() => window.print(), 300);
         }
         function printRekap() {
             if (!rekapData) return;
             const r = Object.assign({}, rekapData, {
-                desa: (appSet.Nama_Desa || 'Salamjaya').toUpperCase(), waktuCetak: rekapTime()
+                desa: (appSet.Nama_Desa || 'Karanghegar').toUpperCase(), waktuCetak: rekapTime()
             });
             if (!useRawBT()) return printRekapBrowser(r);
             const modeStruk = String(appSet.Mode_Struk || '').trim().toLowerCase();
